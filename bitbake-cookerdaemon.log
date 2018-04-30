@@ -1,0 +1,91 @@
+--- Starting bitbake server pid 16543 at 2018-04-30 16:18:25.246882 ---
+Started bitbake server pid 16543
+DEBUG: Found bblayers.conf (/home/harry/poky-rocko/build/conf/bblayers.conf)
+DEBUG: Adding layer /home/harry/poky-rocko/meta
+DEBUG: Adding layer /home/harry/poky-rocko/meta-poky
+DEBUG: Adding layer /home/harry/poky-rocko/meta-openembedded/meta-oe
+DEBUG: Adding layer /home/harry/poky-rocko/meta-openembedded/meta-networking
+DEBUG: Adding layer /home/harry/poky-rocko/meta-openembedded/meta-python
+DEBUG: Adding layer /home/harry/poky-rocko/meta-stigbot4-16
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:740: including conf/abi_version.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:741: including conf/site.conf
+DEBUG: CONF file 'conf/site.conf' not found
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:742: including conf/auto.conf
+DEBUG: CONF file 'conf/auto.conf' not found
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:743: including conf/local.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:744: including conf/multiconfig/default.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:745: including conf/machine/duovero.conf
+DEBUG: CONF /home/harry/poky-rocko/meta-stigbot4-16/conf/machine/duovero.conf:10: including conf/machine/include/soc-family.inc
+DEBUG: CONF /home/harry/poky-rocko/meta-stigbot4-16/conf/machine/duovero.conf:11: including conf/machine/include/tune-cortexa9.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/tune-cortexa9.inc:3: including conf/machine/include/arm/arch-armv7a.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv7a.inc:8: including conf/machine/include/arm/arch-armv6.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv6.inc:8: including conf/machine/include/arm/arch-armv5-dsp.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv5-dsp.inc:4: including conf/machine/include/arm/arch-armv5.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv5.inc:8: including conf/machine/include/arm/arch-armv4.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv4.inc:15: including conf/machine/include/arm/arch-arm.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv4.inc:16: including conf/machine/include/arm/feature-arm-thumb.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv5.inc:9: including conf/machine/include/arm/feature-arm-vfp.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/machine/include/arm/arch-armv7a.inc:9: including conf/machine/include/arm/feature-arm-neon.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:746: including conf/machine-sdk/x86_64.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:747: including conf/distro/poky.conf
+DEBUG: CONF /home/harry/poky-rocko/meta-poky/conf/distro/poky.conf:101: including conf/distro/include/poky-world-exclude.inc
+DEBUG: CONF /home/harry/poky-rocko/meta-poky/conf/distro/poky.conf:102: including conf/distro/include/no-static-libs.inc
+Entering server connection loop
+DEBUG: CONF /home/harry/poky-rocko/meta-poky/conf/distro/poky.conf:103: including conf/distro/include/yocto-uninative.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:748: including conf/distro/defaultsetup.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:1: including conf/distro/include/default-providers.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:2: including conf/distro/include/default-versions.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:3: including conf/distro/include/default-distrovars.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:4: including conf/distro/include/world-broken.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:7: including conf/distro/include/tcmode-default.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/include/tcmode-default.inc:71: including conf/distro/include/as-needed.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:10: including conf/distro/include/tclibc-glibc.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/distro/defaultsetup.conf:12: including conf/distro/include/uninative-flags.inc
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:749: including conf/documentation.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:750: including conf/licenses.conf
+DEBUG: CONF /home/harry/poky-rocko/meta/conf/bitbake.conf:751: including conf/sanity.conf
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/base.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/patch.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:4)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/terminal.bbclass (from /home/harry/poky-rocko/meta/classes/patch.bbclass:11)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/staging.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:5)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/mirrors.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:7)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/utils.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:8)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/utility-tasks.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:9)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/metadata_scm.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:10)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/logging.bbclass (from /home/harry/poky-rocko/meta/classes/base.bbclass:11)
+DEBUG: Inheriting /home/harry/poky-rocko/meta-poky/classes/poky-sanity.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/uninative.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/package_ipk.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/package.bbclass (from /home/harry/poky-rocko/meta/classes/package_ipk.bbclass:1)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/packagedata.bbclass (from /home/harry/poky-rocko/meta/classes/package.bbclass:41)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/chrpath.bbclass (from /home/harry/poky-rocko/meta/classes/package.bbclass:42)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/insane.bbclass (from /home/harry/poky-rocko/meta/classes/package.bbclass:45)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/image-mklibs.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/linuxloader.bbclass (from /home/harry/poky-rocko/meta/classes/image-mklibs.bbclass:5)
+Accepting [<socket.socket fd=7, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, laddr=bitbake.sock>]
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/image-prelink.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/debian.bbclass (from configuration INHERITs:0)
+Connecting Client
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/devshell.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/sstate.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/license.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/remove-libtool.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/blacklist.bbclass (from configuration INHERITs:0)
+DEBUG: Inheriting /home/harry/poky-rocko/meta/classes/sanity.bbclass (from configuration INHERITs:0)
+DEBUG: Clearing SRCREV cache due to cache policy of: clear
+DEBUG: Using cache in '/home/harry/poky-rocko/build/cache/local_file_checksum_cache.dat'
+DEBUG: Using cache in '/home/harry/poky-rocko/build/cache/bb_codeparser.dat'
+Running command ['setFeatures', [2]]
+Running command ['updateConfig', {'abort': True, 'force': False, 'invalidate_stamp': None, 'verbose': False, 'debug': 0, 'dry_run': False, 'dump_signatures': [], 'debug_domains': [], 'extra_assume_provided': [], 'profile': False, 'prefile': [], 'postfile': [], 'server_timeout': None}, {'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'USER': 'harry', 'PWD': '/home/harry/poky-rocko/meta-stigbot4-16', 'HOME': '/home/harry', 'SSH_AGENT_PID': '1453', 'BBPATH': '/home/harry/poky-rocko/build', 'BB_ENV_EXTRAWHITE': 'ALL_PROXY BBPATH_EXTRA BB_NO_NETWORK BB_NUMBER_THREADS BB_SETSCENE_ENFORCE BB_SRCREV_POLICY DISTRO FTPS_PROXY FTP_PROXY GIT_PROXY_COMMAND HTTPS_PROXY HTTP_PROXY MACHINE NO_PROXY PARALLEL_MAKE SCREENDIR SDKMACHINE SOCKS5_PASSWD SOCKS5_USER SSH_AGENT_PID SSH_AUTH_SOCK STAMPS_DIR TCLIBC TCMODE all_proxy ftp_proxy ftps_proxy http_proxy https_proxy no_proxy ', 'TERM': 'xterm-256color', 'SHELL': '/bin/bash', 'LOGNAME': 'harry', 'PATH': '/home/harry/poky-rocko/scripts:/home/harry/poky-rocko/bitbake/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'LC_ALL': 'en_US.UTF-8', 'CLUTTER_IM_MODULE': 'xim', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'LC_MEASUREMENT': 'en_GB.UTF-8', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'LC_PAPER': 'en_GB.UTF-8', 'LC_MONETARY': 'en_GB.UTF-8', 'XDG_MENU_PREFIX': 'gnome-', 'LANG': 'en_US.UTF-8', 'DISPLAY': ':1', 'OLDPWD': '/home/harry/poky-rocko', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'COLORTERM': 'truecolor', 'DESKTOP_AUTOSTART_ID': '10fcb21d0fcea102ce152507101521654900000013600008', 'USERNAME': 'harry', 'XDG_VTNR': '2', 'MANDATORY_PATH': '/usr/share/gconf/ubuntu.mandatory.path', 'LC_NAME': 'en_GB.UTF-8', 'XDG_SESSION_ID': '3', 'DESKTOP_SESSION': 'ubuntu', 'QT4_IM_MODULE': 'xim', 'TEXTDOMAINDIR': '/usr/share/locale/', 'DEFAULTS_PATH': '/usr/share/gconf/ubuntu.default.path', 'JOURNAL_STREAM': '9:29032', 'TEXTDOMAIN': 'im-config', 'QT_ACCESSIBILITY': '1', 'XDG_SESSION_TYPE': 'x11', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/ubuntu:/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'XDG_SESSION_DESKTOP': 'ubuntu', 'LC_ADDRESS': 'en_GB.UTF-8', 'LC_NUMERIC': 'en_GB.UTF-8', 'BUILDDIR': '/home/harry/poky-rocko/build', 'GTK_MODULES': 'gail:atk-bridge', 'PAPERSIZE': 'a4', 'WINDOWPATH': '2', 'VTE_VERSION': '4804', 'QT_IM_MODULE': 'ibus', 'XMODIFIERS': '@im=ibus', 'IM_CONFIG_PHASE': '2', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XDG_SEAT': 'seat0', 'SHLVL': '1', 'LANGUAGE': 'en_US:en', 'WINDOWID': '69206022', 'LC_TELEPHONE': 'en_GB.UTF-8', 'GDMSESSION': 'ubuntu', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'XDG_RUNTIME_DIR': '/run/user/1000', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg/xdg-ubuntu:/etc/xdg', 'LC_IDENTIFICATION': 'en_GB.UTF-8', 'SESSION_MANAGER': 'local/harry-System-Product-Name:@/tmp/.ICE-unix/1360,unix/harry-System-Product-Name:/tmp/.ICE-unix/1360', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'GTK_IM_MODULE': 'ibus', 'LC_TIME': 'en_GB.UTF-8', '_': '/home/harry/poky-rocko/bitbake/bin/bitbake'}, ['/home/harry/poky-rocko/bitbake/bin/bitbake', 'console-image-stig']]
+Running command ['getVariable', 'BBINCLUDELOGS']
+Running command ['getVariable', 'BBINCLUDELOGS_LINES']
+Running command ['getSetVariable', 'BB_CONSOLELOG']
+Running command ['getUIHandlerNum']
+Running command ['setEventMask', 1, 20, {}, ['bb.runqueue.runQueueExitWait', 'bb.event.LogExecTTY', 'logging.LogRecord', 'bb.build.TaskFailed', 'bb.build.TaskBase', 'bb.event.ParseStarted', 'bb.event.ParseProgress', 'bb.event.ParseCompleted', 'bb.event.CacheLoadStarted', 'bb.event.CacheLoadProgress', 'bb.event.CacheLoadCompleted', 'bb.command.CommandFailed', 'bb.command.CommandExit', 'bb.command.CommandCompleted', 'bb.cooker.CookerExit', 'bb.event.MultipleProviders', 'bb.event.NoProvider', 'bb.runqueue.sceneQueueTaskStarted', 'bb.runqueue.runQueueTaskStarted', 'bb.runqueue.runQueueTaskFailed', 'bb.runqueue.sceneQueueTaskFailed', 'bb.event.BuildBase', 'bb.build.TaskStarted', 'bb.build.TaskSucceeded', 'bb.build.TaskFailedSilent', 'bb.build.TaskProgress', 'bb.event.ProcessStarted', 'bb.event.ProcessProgress', 'bb.event.ProcessFinished']]
+Running command ['getVariable', 'BB_DEFAULT_TASK']
+Running command ['setConfig', 'cmd', 'build']
+Running command ['buildTargets', ['console-image-stig'], 'build']
+Connecting Client
+Disconnecting Client
+No timeout, exiting.
+Exiting
