@@ -43,6 +43,10 @@ The tutorial in that link is not using a standard folder structure. To make it s
 	~/poky-rocko$ git clone https://github.com/freedomcondor/meta-stigbot4-16
 	change folder name (remove 4-16)
 
+	or simply:
+
+	~/poky-rocko$ git clone https://github.com/freedomcondor/meta-stigbot4-16 meta-stigbot
+
 4. prepare build by setup poky-rocko/build/conf:
 	
 	~/poky-rocko$ source poky-rocko/oe-init-build-env

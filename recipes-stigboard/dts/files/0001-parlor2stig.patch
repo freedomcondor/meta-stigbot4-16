@@ -1,0 +1,25 @@
+From 22ec3da26469d54888b0bf207ab020cb012a57db Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Tue, 1 May 2018 15:20:50 +0200
+Subject: [PATCH] parlor2stig
+
+---
+ include/configs/ti_omap4_common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/ti_omap4_common.h b/include/configs/ti_omap4_common.h
+index bdb2ce69cf..6b40feee60 100644
+--- a/include/configs/ti_omap4_common.h
++++ b/include/configs/ti_omap4_common.h
+@@ -128,7 +128,7 @@
+ 		"if test $board_name = panda-es; then " \
+ 			"setenv fdtfile omap4-panda-es.dtb; fi;" \
+ 		"if test $board_name = duovero; then " \
+-			"setenv fdtfile omap4-duovero-parlor.dtb; fi;" \
++			"setenv fdtfile omap4-duovero-stig.dtb; fi;" \
+ 		"if test $fdtfile = undefined; then " \
+ 			"echo WARNING: Could not determine device tree to use; fi; \0" \
+ 	BOOTENV
+-- 
+2.14.1
+
