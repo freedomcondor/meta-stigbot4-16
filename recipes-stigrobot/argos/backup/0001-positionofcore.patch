@@ -1,0 +1,27 @@
+From 19e357cb27fa8fc13c0f98859f68c61a5433ee60 Mon Sep 17 00:00:00 2001
+From: freedomcondor <zhuweixu_harry@126.com>
+Date: Wed, 7 Mar 2018 15:35:13 +0100
+Subject: [PATCH] positionofcore
+
+---
+ src/core/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/CMakeLists.txt b/core/CMakeLists.txt
+index cdb7973..9154d70 100644
+--- a/core/CMakeLists.txt
++++ b/core/CMakeLists.txt
+@@ -246,8 +246,8 @@ if(ARGOS_WITH_LUA)
+ endif(ARGOS_WITH_LUA)
+ install(TARGETS argos3core_${ARGOS_BUILD_FOR}
+   RUNTIME DESTINATION bin
+-  LIBRARY DESTINATION lib/argos3
+-  ARCHIVE DESTINATION lib/argos3)
++  LIBRARY DESTINATION lib
++  ARCHIVE DESTINATION lib)
+ 
+ if(ARGOS_BUILD_FOR_SIMULATOR)
+   #
+-- 
+2.7.4
+

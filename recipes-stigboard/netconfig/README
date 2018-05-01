@@ -1,0 +1,3 @@
+Overwrite /etc/network/interfaces file to switch on wifi auto connection
+
+for wifi ssid and password, it is in recipes-connectivity/wpa-supplicant

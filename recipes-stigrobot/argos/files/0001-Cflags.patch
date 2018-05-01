@@ -1,0 +1,33 @@
+From 990c6dd670ff2b981c1beca0e29948c8b03bd1ed Mon Sep 17 00:00:00 2001
+From: freedomcondor <zhuweixu_harry@126.com>
+Date: Mon, 5 Mar 2018 17:40:05 +0100
+Subject: [PATCH] Cflags
+
+---
+ src/cmake/ARGoSBuildFlags.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/ARGoSBuildFlags.cmake b/cmake/ARGoSBuildFlags.cmake
+index 81331b6..d6ffa02 100644
+--- a/cmake/ARGoSBuildFlags.cmake
++++ b/cmake/ARGoSBuildFlags.cmake
+@@ -9,14 +9,14 @@ execute_process(
+ #
+ # General compilation flags
+ #
+-set(CMAKE_C_FLAGS                  "-Wall")
++set(CMAKE_C_FLAGS                  "${CMAKE_C_FLAGS} -Wall")
+ if(ARGOS_BUILD_NATIVE)
+   set(CMAKE_C_FLAGS                "${CMAKE_C_FLAGS} -mtune=native -march=native")
+ endif(ARGOS_BUILD_NATIVE)
+ set(CMAKE_C_FLAGS_RELEASE          "-O2 -DNDEBUG")
+ set(CMAKE_C_FLAGS_DEBUG            "-ggdb3")
+ set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
+-set(CMAKE_CXX_FLAGS                "-Wall")
++set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wall")
+ if(ARGOS_BUILD_NATIVE)
+   set(CMAKE_CXX_FLAGS              "${CMAKE_CXX_FLAGS} -mtune=native -march=native")
+ endif(ARGOS_BUILD_NATIVE)
+-- 
+2.7.4
+

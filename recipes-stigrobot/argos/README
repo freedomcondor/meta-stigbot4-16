@@ -1,0 +1,7 @@
+Install argos for robots
+
+depends on lua
+
+download source from git
+the patch is to fix a compilation error:
+	cmake in argos overwrites CMAKE_C(XX)_FLAGS, which contains flags for board. It shouldn't
