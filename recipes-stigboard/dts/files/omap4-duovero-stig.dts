@@ -37,6 +37,30 @@
 	pinctrl-0 = <&i2c2_pins>;
 
 	clock-frequency = <400000>;
+
+	pca9632_1: pca9632@10 {
+		compatible = "nxp,pca9635";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x10>;
+
+		leddeck1_red@0    { label = "led_deck[1]:red";   reg = <0>; };
+		leddeck1_green@1  { label = "led_deck[1]:green"; reg = <1>; };
+		leddeck1_blue@2   { label = "led_deck[1]:blue";  reg = <2>; };
+		leddeck2_red@4    { label = "led_deck[2]:red";   reg = <4>; };
+		leddeck2_green@5  { label = "led_deck[2]:green"; reg = <5>; };
+		leddeck2_blue@6   { label = "led_deck[2]:blue";  reg = <6>; };
+		leddeck3_red@8    { label = "led_deck[3]:red";   reg = <8>; };
+		leddeck3_green@9  { label = "led_deck[3]:green"; reg = <9>; };
+		leddeck3_blue@10  { label = "led_deck[3]:blue";  reg = <10>; };
+		leddeck4_red@12   { label = "led_deck[4]:red";   reg = <12>; };
+		leddeck4_green@13 { label = "led_deck[4]:green"; reg = <13>; };
+		leddeck4_blue@14  { label = "led_deck[4]:blue";  reg = <14>; };
+		unused0@3  { reg = <3>; };
+		unused1@7  { reg = <7>; };
+		unused2@11 { reg = <11>; };
+		unused3@15 { reg = <15>; };
+	};
 };
 
 &i2c3 {

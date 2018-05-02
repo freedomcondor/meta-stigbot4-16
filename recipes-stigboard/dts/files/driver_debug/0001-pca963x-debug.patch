@@ -1,0 +1,34 @@
+From 9fd9bb1c2348157dd78d6477eb5d2ff63fece28a Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Tue, 1 May 2018 16:16:03 +0200
+Subject: [PATCH] pca963x-debug
+
+---
+ drivers/leds/leds-pca963x.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/leds/leds-pca963x.c b/drivers/leds/leds-pca963x.c
+index 3bf9a1271819..feb3af452405 100644
+--- a/drivers/leds/leds-pca963x.c
++++ b/drivers/leds/leds-pca963x.c
+@@ -376,6 +376,8 @@ static int pca963x_probe(struct i2c_client *client,
+ 	struct pca963x_chipdef *chip;
+ 	int i, err;
+ 
++	pr_err("pca963x probe start");
++
+ 	if (id) {
+ 		chip = &pca963x_chipdefs[id->driver_data];
+ 	} else {
+@@ -472,6 +474,8 @@ static int pca963x_probe(struct i2c_client *client,
+ 					  mode2);
+ 	}
+ 
++	pr_err("pca963x probe end");
++
+ 	return 0;
+ 
+ exit:
+-- 
+2.14.1
+
