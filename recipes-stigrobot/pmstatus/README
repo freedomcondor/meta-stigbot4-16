@@ -1,0 +1,5 @@
+pmstatus
+
+to communicate with powerboard to get power status.
+
+now a line is added to switch on acutator power

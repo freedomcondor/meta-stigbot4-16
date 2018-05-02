@@ -9,6 +9,7 @@ inherit core-image
 IMAGE_INSTALL += " netinterface \
     lua \
     argos \
+    pmstatus \
 "
 
 CORE_OS = " \
