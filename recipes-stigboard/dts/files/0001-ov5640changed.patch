@@ -1,0 +1,33 @@
+From cd32b7660b04dc71c62768eb0c8ecfb20b066d6e Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Mon, 7 May 2018 11:20:43 +0200
+Subject: [PATCH] ov5640changed
+
+---
+ drivers/media/i2c/ov5640.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/media/i2c/ov5640.c b/drivers/media/i2c/ov5640.c
+index e2dd352224c7..9d72e95ce8a7 100644
+--- a/drivers/media/i2c/ov5640.c
++++ b/drivers/media/i2c/ov5640.c
+@@ -2447,6 +2447,8 @@ static int ov5640_probe(struct i2c_client *client,
+ 	struct ov5640_dev *sensor;
+ 	int ret;
+ 
++									pr_err("Harry said: ov5640 start");
++
+ 	sensor = devm_kzalloc(dev, sizeof(*sensor), GFP_KERNEL);
+ 	if (!sensor)
+ 		return -ENOMEM;
+@@ -2528,6 +2530,7 @@ static int ov5640_probe(struct i2c_client *client,
+ 	if (ret)
+ 		goto free_ctrls;
+ 
++									pr_err("Harry said: ov5640 end");
+ 	return 0;
+ 
+ free_ctrls:
+-- 
+2.14.1
+

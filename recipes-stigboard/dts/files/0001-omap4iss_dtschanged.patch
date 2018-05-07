@@ -1,23 +1,56 @@
-From 5572d2989d62502e48235ad02c5ee7abd49af198 Mon Sep 17 00:00:00 2001
+From 9e6773b37db259b72683bfaad4d3512fd5754edd Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Thu, 3 May 2018 12:30:43 +0200
-Subject: [PATCH] omap4iss_addomap4dtsi
+Date: Mon, 7 May 2018 10:14:47 +0200
+Subject: [PATCH] omap4iss_dtschanged
 
 ---
- arch/arm/boot/dts/omap4.dtsi | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm/boot/dts/omap4.dtsi | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/arch/arm/boot/dts/omap4.dtsi b/arch/arm/boot/dts/omap4.dtsi
-index 475904894b86..afc493e54aa4 100644
+index 475904894b86..b0f9ea309a9c 100644
 --- a/arch/arm/boot/dts/omap4.dtsi
 +++ b/arch/arm/boot/dts/omap4.dtsi
-@@ -769,6 +769,10 @@
+@@ -763,12 +763,43 @@
+ 					<SYSC_IDLE_SMART_WKUP>;
+ 			ti,sysc-delay-us = <2>;
+ 			clocks = <&iss_clkctrl OMAP4_ISS_CLKCTRL 0>;
++			//		 <&iss_clkctrl OMAP4_ISS_CLKCTRL 8>;
++			//clock-names = "fck","ick";
+ 			clock-names = "fck";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
  			ranges = <0 0x52000000 0x1000000>;
  
  			/* No child device binding, driver in staging */
 +			iss: iss@0 {
-+					compatible = "ti,omap4iss";
-+					harry = <0x123 0x321 0x456>;
++				compatible = "ti,omap4iss";
++				reg =  	<0x0000 0x200>,		/* top */
++						<0x1000 0x170>, /* csi2_a_regs1 */
++						<0x1170 0x020>, /* camerarx_core1 */
++						<0x1400 0x170>, /* csi2_b_regs1 */
++						<0x1570 0x020>, /* camerarx_core2 */
++						<0x2000 0x200>, /* bte */
++						<0x10000 0x0a0>, /* isp_sys1 */
++						<0x10400 0x400>, /* isp_resizer */
++						<0x10800 0x800>, /* isp_ipipe */
++						<0x11000 0x200>, /* isp_isif */
++						<0x11200 0x080>; /* isp_ipipeif */
++
++				harry = <0x123 0x321 0x456>;
++				//syscon = <&scm_conf 0x6c>;	// copy from isp
++				syscon = <&scm_conf>; 
++				//status = "ok";
++				//ti,hwmods = "iss";
++				interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
++
++				clocks = <&iss_clkctrl OMAP4_ISS_CLKCTRL 0>,
++					   	 <&iss_clkctrl OMAP4_ISS_CLKCTRL 8>;
++				//clocks = <&ducati_clk_mux_ck>, <&iss_ctrlclk>;
++				clock-names = "iss_fck","iss_ctrlclk";
++
++				dmas = <&sdma 9>, <&sdma 10>, <&sdma 12>, <&sdma 13>;
++				dma-names = "1", "2", "3", "4";	// only 4 originally, 5 is a flag
 +			};
  		};
  

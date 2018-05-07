@@ -15,6 +15,7 @@
 	model = "OMAP4430 Gumstix Duovero on Parlor";
 	compatible = "gumstix,omap4-duovero-parlor", "gumstix,omap4-duovero", "ti,omap4430", "ti,omap4";
 
+	/***********  uart clock *********************************/
 	uart56_osc: uart56_osc {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -40,6 +41,66 @@
 		#clock-cells = <0>;
 		enable-gpios = <&gpio3 18 GPIO_ACTIVE_HIGH>; /* cam_strobe.gpio_82: uart78_clk_en */
 	};
+
+	/***********  ov5640 clock and regulator *********************************/
+
+	ov5640_1_osc: oscillator {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+		//clock-output-names = "ov5640_1_osc";
+	};
+
+	ov5640_1_clk: clock2 {
+		compatible = "gpio-gate-clock";
+		#clock-cells = <0>;
+		clocks = <&ov5640_1_osc>;
+		enable-gpios = <&ov5640_1_gpio 4 GPIO_ACTIVE_HIGH>; // ov5640_1_osc enable 
+	};
+
+/*
+	ov5640_2_osc: oscillator {
+		compatible = "fixed-clock";
+		#clock-cells = <1>;
+		clock-frequency = <24000000>;
+		//clock-output-names = "ov5640_2_osc";
+	};
+	ov5640_2_clk: clock {
+		compatible = "gpio-gate-clock";
+		clocks = <&ov5640_2_osc>;
+		#clock-cells = <0>;
+		enable-gpios = <&ov5640_2_gpio 4 GPIO_ACTIVE_HIGH>; // ov5640_2_osc enable 
+	};
+*/
+
+	regulator1800: regulator1800 {
+		compatible = "regulator-fixed";
+		regulator-name = "DOVDD";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&ov5640_1_gpio 0 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		gpio-open-drain;
+	};
+
+	regulator2800: regulator2800 {
+		compatible = "regulator-fixed";
+		regulator-name = "AVDD";
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2800000>;
+		gpio = <&ov5640_1_gpio 1 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		gpio-open-drain;
+	};
+
+	regulator1500: regulator1500 {
+		compatible = "regulator-fixed";
+		regulator-name = "DVDD";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+	};
 };
 
 &omap4_pmx_core {
@@ -62,6 +123,7 @@
 		>;
 	};
 
+	/***********  uart pins *********************************/
 	uart56ctrl_pins: pinmux_uart56ctrl_pins {
 		pinctrl-single,pins = <
 			OMAP4_IOPAD(0x068, PIN_INPUT_PULLUP | MUX_MODE3)	/* gpmc_a20.gpio_44: uart56_irq */
@@ -75,6 +137,18 @@
 			OMAP4_IOPAD(0x070, PIN_INPUT_PULLUP | MUX_MODE3)	/* gpmc_a24.gpio_48: uart78_irq */
 			OMAP4_IOPAD(0x06c, PIN_INPUT_PULLUP | MUX_MODE3)	/* gpmc_a24.gpio_46: uart78_nrst */
 			OMAP4_IOPAD(0x0be, PIN_OUTPUT | MUX_MODE3)		/* cam_strobe.gpio_82: uart78_clk_en */
+		>;
+	};
+
+	/*********** csi2 pins *********************************/
+	iss_csi21_pins: pinmux_iss_csi21_pins {
+		pinctrl-single,pins = <
+			OMAP4_IOPAD(0x0a0, PIN_INPUT | MUX_MODE0)		/* csi21_dx0.csi21_dx0 */
+			OMAP4_IOPAD(0x0a2, PIN_INPUT | MUX_MODE0)		/* csi21_dy0.csi21_dy0 */
+			OMAP4_IOPAD(0x0a4, PIN_INPUT | MUX_MODE0)		/* csi21_dx1.csi21_dx1 */
+			OMAP4_IOPAD(0x0a6, PIN_INPUT | MUX_MODE0)		/* csi21_dy1.csi21_dy1 */
+			OMAP4_IOPAD(0x0a8, PIN_INPUT | MUX_MODE0)		/* csi21_dx2.csi21_dx2 */
+			OMAP4_IOPAD(0x0aa, PIN_INPUT | MUX_MODE0)		/* csi21_dy2.csi21_dy2 */
 		>;
 	};
 };
@@ -342,6 +416,74 @@
 		reg = <0x51>;
 		pagesize = <8>;
 	};
+
+	i2c-mux@70 {
+		compatible = "nxp,pca9542";	// need the compatible
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x70>;
+
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			ov5640_1_gpio: pca9554@38 {		// it is the pca953x driver you should turn on
+				compatible = "nxp,pca9554";
+				reg = <0x38>;
+				gpio-controller;
+				#gpio-cells = <2>;
+			};
+
+			ov5640_flash: pca9633@60 {	// check the address
+				compatible = "nxp,pca9633";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0x60>;		// check the address
+
+				tl@0{
+					label = "ov5640_1_flash_tl";
+					reg = <0>;
+				};
+				tr@1{
+					label = "ov5640_1_flash_tr";
+					reg = <1>;
+				};
+				bl@2{
+					label = "ov5640_1_flash_bl";
+					reg = <2>;
+				};
+				br@3{
+					label = "ov5640_1_flash_br";
+					reg = <3>;
+				};
+			};
+
+			ov5640_1: camera@3c {
+				compatible = "ovti,ov5640";
+				status = "ok";
+				reg = <0x3c>;
+
+				clocks = <&ov5640_1_clk>;
+				clock-names = "xclk";
+
+				DOVDD-supply = <&regulator1800>;
+				AVDD-supply = <&regulator2800>;
+				DVDD-supply = <&regulator1500>;
+
+				powerdown-gpios = <&ov5640_1_gpio 5 GPIO_ACTIVE_HIGH>; // power down 
+				reset-gpios = <&ov5640_1_gpio 6 GPIO_ACTIVE_LOW>; // reset 
+
+				port {
+					ov5640_11: endpoint {
+						clock-lanes = <0>;
+						data-lanes = <1>;
+						remote-endpoint = <&csi_endpoint>;
+					};
+				};
+			};
+		};
+	};
 };
 
 &mmc3 {
@@ -355,5 +497,18 @@
 
 &iss {
 	status = "ok";
+	pinctrl-names = "default";
+	pinctrl-0 = <&iss_csi21_pins>;
+
+	csi21: csi2 {
+		port {
+			csi_endpoint: endpoint {
+				channel = "0";
+				clock-lanes = <0>;
+				data-lanes = <1>;
+				remote-endpoint = <&ov5640_11>;
+			};
+		};
+	};
 };
 

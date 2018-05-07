@@ -20,15 +20,18 @@ SRC_URI += "file://0001-vcnl-match.patch"
 #	#this patch is for adding a of_match_table for the probe function
 #	#result: should see 12 iio:device under /sys/bus/iio/devices/
 
-#5. camera
-#	#to do
-
-#6. omap4iss
+#5. omap4iss
 SRC_URI += "file://v4l2_omap4iss.cfg"
 SRC_URI += "file://0001-omap4iss_dtschanged.patch"
 SRC_URI += "file://0001-omap4iss_driverchanged.patch"
 SRC_URI += "file://devmem.cfg"	
 #	#create /dev/mem for rwmem debug
+
+#6. camera
+SRC_URI += "file://pca953x.cfg"
+#SRC_URI += "file://ov5640.cfg"
+#	#ov5640.cfg depends on v4l2, so it has to be after v4l2_omap4iss.cfg
+#SRC_URI += "file://0001-ov5640changed.patch"
 
 # for device tree
 #	change device tree from omap4-duovero-parlor.dts to omap4-duovero-stig.dts
