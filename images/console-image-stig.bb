@@ -7,6 +7,8 @@ IMAGE_LINGUAS = "en-us"
 inherit core-image
 
 IMAGE_INSTALL += " netinterface \
+    rwmem \
+    media-ctl \
     lua \
     argos \
     pmstatus \

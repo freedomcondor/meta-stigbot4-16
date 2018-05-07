@@ -23,6 +23,13 @@ SRC_URI += "file://0001-vcnl-match.patch"
 #5. camera
 #	#to do
 
+#6. omap4iss
+SRC_URI += "file://v4l2_omap4iss.cfg"
+SRC_URI += "file://0001-omap4iss_dtschanged.patch"
+SRC_URI += "file://0001-omap4iss_driverchanged.patch"
+SRC_URI += "file://devmem.cfg"	
+#	#create /dev/mem for rwmem debug
+
 # for device tree
 #	change device tree from omap4-duovero-parlor.dts to omap4-duovero-stig.dts
 #	works together with u-boot_%.bbappend

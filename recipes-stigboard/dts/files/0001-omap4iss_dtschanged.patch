@@ -1,0 +1,27 @@
+From 5572d2989d62502e48235ad02c5ee7abd49af198 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Thu, 3 May 2018 12:30:43 +0200
+Subject: [PATCH] omap4iss_addomap4dtsi
+
+---
+ arch/arm/boot/dts/omap4.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/omap4.dtsi b/arch/arm/boot/dts/omap4.dtsi
+index 475904894b86..afc493e54aa4 100644
+--- a/arch/arm/boot/dts/omap4.dtsi
++++ b/arch/arm/boot/dts/omap4.dtsi
+@@ -769,6 +769,10 @@
+ 			ranges = <0 0x52000000 0x1000000>;
+ 
+ 			/* No child device binding, driver in staging */
++			iss: iss@0 {
++					compatible = "ti,omap4iss";
++					harry = <0x123 0x321 0x456>;
++			};
+ 		};
+ 
+ 		mmu_ipu: mmu@55082000 {
+-- 
+2.14.1
+

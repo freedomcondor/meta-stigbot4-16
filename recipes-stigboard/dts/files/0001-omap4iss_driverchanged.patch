@@ -1,0 +1,50 @@
+From a0983898ce411571d4eaf5ce3546e7e66a5c04a3 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Thu, 3 May 2018 12:33:08 +0200
+Subject: [PATCH] omap4iss_driverchanged
+
+---
+ drivers/staging/media/omap4iss/iss.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/staging/media/omap4iss/iss.c b/drivers/staging/media/omap4iss/iss.c
+index b1036baebb03..149155fe2d4d 100644
+--- a/drivers/staging/media/omap4iss/iss.c
++++ b/drivers/staging/media/omap4iss/iss.c
+@@ -1207,6 +1207,8 @@ static int iss_probe(struct platform_device *pdev)
+ 	unsigned int i;
+ 	int ret;
+ 
++							pr_err("Harry said: iss_probe start");
++
+ 	if (!pdata)
+ 		return -EINVAL;
+ 
+@@ -1342,6 +1344,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
+ 	{ "omap4iss", 0 },
+ 	{ },
+ };
++
++/* add of match table  */
++static const struct of_device_id omap4iss_of_table[] = {
++	{ .compatible = "ti,omap4iss" },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, omap4iss_of_table);
++/* end adding of match table  */
++
++
+ MODULE_DEVICE_TABLE(platform, omap4iss_id_table);
+ 
+ static struct platform_driver iss_driver = {
+@@ -1350,6 +1362,7 @@ static struct platform_driver iss_driver = {
+ 	.id_table	= omap4iss_id_table,
+ 	.driver = {
+ 		.name	= "omap4iss",
++		.of_match_table = of_match_ptr(omap4iss_of_table),
+ 	},
+ };
+ 
+-- 
+2.14.1
+
