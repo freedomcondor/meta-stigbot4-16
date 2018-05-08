@@ -1,14 +1,14 @@
-From ed98a96691397f915be1220b9b6d3d972b43873b Mon Sep 17 00:00:00 2001
+From 96d80e2d028b0967aabf49579644c3aaf560ec71 Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Mon, 7 May 2018 10:16:00 +0200
+Date: Tue, 8 May 2018 15:30:14 +0200
 Subject: [PATCH] omap4iss_driverchanged
 
 ---
- drivers/staging/media/omap4iss/iss.c | 77 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 76 insertions(+), 1 deletion(-)
+ drivers/staging/media/omap4iss/iss.c | 76 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/staging/media/omap4iss/iss.c b/drivers/staging/media/omap4iss/iss.c
-index b1036baebb03..bfbb57c2fd25 100644
+index b1036baebb03..ac761be60b65 100644
 --- a/drivers/staging/media/omap4iss/iss.c
 +++ b/drivers/staging/media/omap4iss/iss.c
 @@ -28,6 +28,8 @@
@@ -20,27 +20,21 @@ index b1036baebb03..bfbb57c2fd25 100644
  #include "iss.h"
  #include "iss_regs.h"
  
-@@ -560,6 +562,7 @@ static int iss_reset(struct iss_device *iss)
- {
- 	unsigned int timeout;
- 
-+	/*
- 	iss_reg_set(iss, OMAP4_ISS_MEM_TOP, ISS_HL_SYSCONFIG,
- 		    ISS_HL_SYSCONFIG_SOFTRESET);
- 
-@@ -570,6 +573,7 @@ static int iss_reset(struct iss_device *iss)
- 		dev_err(iss->dev, "ISS reset timeout\n");
- 		return -ETIMEDOUT;
+@@ -841,7 +843,6 @@ static int iss_get_clocks(struct iss_device *iss)
+ 		dev_err(iss->dev, "Unable to get iss_ctrlclk clock info\n");
+ 		return PTR_ERR(iss->iss_ctrlclk);
  	}
-+	*/
+-
+ 	return 0;
+ }
  
- 	media_entity_enum_zero(&iss->crashed);
- 
-@@ -866,12 +870,15 @@ struct iss_device *omap4iss_get(struct iss_device *iss)
+@@ -866,12 +867,17 @@ struct iss_device *omap4iss_get(struct iss_device *iss)
  	if (iss->ref_count > 0)
  		goto out;
  
 +											pr_err("omap4iss_get before enable clocks");
++											dump_stack();
++
  	if (iss_enable_clocks(iss) < 0) {
  		__iss = NULL;
  		goto out;
@@ -52,24 +46,23 @@ index b1036baebb03..bfbb57c2fd25 100644
  
  out:
  	if (__iss)
-@@ -993,12 +1000,15 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -993,12 +999,15 @@ static int iss_register_entities(struct iss_device *iss)
  		sizeof(iss->media_dev.model));
  	iss->media_dev.hw_revision = iss->revision;
  	iss->media_dev.ops = &iss_media_ops;
--	ret = media_device_register(&iss->media_dev);
-+	//ret = media_device_register(&iss->media_dev);
 +	media_device_init(&iss->media_dev);
-+	/*
++
+ 	ret = media_device_register(&iss->media_dev);
  	if (ret < 0) {
  		dev_err(iss->dev, "Media device registration failed (%d)\n",
  			ret);
  		return ret;
  	}
-+	*/
++	
  
  	iss->v4l2_dev.mdev = &iss->media_dev;
  	ret = v4l2_device_register(iss->dev, &iss->v4l2_dev);
-@@ -1030,6 +1040,7 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1030,6 +1039,7 @@ static int iss_register_entities(struct iss_device *iss)
  		goto done;
  
  	/* Register external entities */
@@ -77,7 +70,7 @@ index b1036baebb03..bfbb57c2fd25 100644
  	for (subdevs = pdata->subdevs; subdevs && subdevs->subdevs; ++subdevs) {
  		struct v4l2_subdev *sensor;
  		struct media_entity *input;
-@@ -1042,10 +1053,12 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1042,10 +1052,12 @@ static int iss_register_entities(struct iss_device *iss)
  
  		sensor->host_priv = subdevs;
  
@@ -90,7 +83,7 @@ index b1036baebb03..bfbb57c2fd25 100644
  		switch (subdevs->interface) {
  		case ISS_INTERFACE_CSI2A_PHY1:
  			input = &iss->csi2a.subdev.entity;
-@@ -1073,9 +1086,14 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1073,9 +1085,14 @@ static int iss_register_entities(struct iss_device *iss)
  		if (ret < 0)
  			goto done;
  	}
@@ -105,7 +98,7 @@ index b1036baebb03..bfbb57c2fd25 100644
  done:
  	if (ret < 0)
  		iss_unregister_entities(iss);
-@@ -1207,13 +1225,19 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1207,13 +1224,19 @@ static int iss_probe(struct platform_device *pdev)
  	unsigned int i;
  	int ret;
  
@@ -125,7 +118,7 @@ index b1036baebb03..bfbb57c2fd25 100644
  	mutex_init(&iss->iss_mutex);
  
  	iss->dev = &pdev->dev;
-@@ -1235,24 +1259,50 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1235,21 +1258,45 @@ static int iss_probe(struct platform_device *pdev)
  		goto error;
  	}
  
@@ -161,22 +154,17 @@ index b1036baebb03..bfbb57c2fd25 100644
  
 +										pr_err("iss_probe after omap4iss get");
 +
-+	/*
++										/*
  	ret = iss_reset(iss);
  	if (ret < 0)
  		goto error_iss;
-+	*/
++										*/
 +
 +										pr_err("iss_probe after reset");
  
-+	/*
  	iss->revision = iss_reg_read(iss, OMAP4_ISS_MEM_TOP, ISS_HL_REVISION);
  	dev_info(iss->dev, "Revision %08x found\n", iss->revision);
-+	*/
- 
- 	for (i = 1; i < OMAP4_ISS_MEM_LAST; i++) {
- 		ret = iss_map_mem_resource(pdev, iss, i);
-@@ -1270,6 +1320,8 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1270,6 +1317,8 @@ static int iss_probe(struct platform_device *pdev)
  	if (ret < 0)
  		goto error_iss;
  
@@ -185,7 +173,7 @@ index b1036baebb03..bfbb57c2fd25 100644
  	ret = iss_isp_reset(iss);
  	if (ret < 0)
  		goto error_iss;
-@@ -1293,25 +1345,37 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1293,27 +1342,40 @@ static int iss_probe(struct platform_device *pdev)
  		goto error_iss;
  	}
  
@@ -218,12 +206,23 @@ index b1036baebb03..bfbb57c2fd25 100644
 +
  	omap4iss_put(iss);
  
-+										pr_err("iss_probe after put");
++										pr_err("iss_probe after putput");
 +
  	return 0;
  
++
  error_entities:
-@@ -1342,6 +1406,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
+ 	iss_unregister_entities(iss);
+ 	media_entity_enum_cleanup(&iss->crashed);
+@@ -1324,6 +1386,7 @@ static int iss_probe(struct platform_device *pdev)
+ error:
+ 	mutex_destroy(&iss->iss_mutex);
+ 
++										pr_err("iss_probe before return ret: %d",ret);
+ 	return ret;
+ }
+ 
+@@ -1342,6 +1405,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
  	{ "omap4iss", 0 },
  	{ },
  };
@@ -240,7 +239,7 @@ index b1036baebb03..bfbb57c2fd25 100644
  MODULE_DEVICE_TABLE(platform, omap4iss_id_table);
  
  static struct platform_driver iss_driver = {
-@@ -1350,6 +1424,7 @@ static struct platform_driver iss_driver = {
+@@ -1350,6 +1423,7 @@ static struct platform_driver iss_driver = {
  	.id_table	= omap4iss_id_table,
  	.driver = {
  		.name	= "omap4iss",

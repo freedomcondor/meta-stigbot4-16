@@ -17,8 +17,11 @@ PV = "4.16.5"
 SRCREV = "e5ce9f6879d3fe20435f34dfd86fb76c36072916"
 SRC_URI = " \
     git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git;branch=linux-${LINUX_VERSION}.y \
-    file://defconfig \
     file://0001-spidev-Add-spidev-compatible-id.patch \
     file://0002-mwifiex-Skip-unsupported-CHAN_REGION_CFG-cmd.patch \
     file://0003-mwifiex-Remove-unsupported-GTK_REKEY_OFFLOAD_CFG-cmd.patch \
+    file://defconfig \
 "
+
+#    file://0004-Add-support-for-the-BuilderBot-AVRs.patch \
+#    file://avr-support.cfg \

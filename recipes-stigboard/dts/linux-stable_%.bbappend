@@ -29,9 +29,12 @@ SRC_URI += "file://devmem.cfg"
 
 #6. camera
 SRC_URI += "file://pca953x.cfg"
-#SRC_URI += "file://ov5640.cfg"
+SRC_URI += "file://ov5640.cfg"
 #	#ov5640.cfg depends on v4l2, so it has to be after v4l2_omap4iss.cfg
 #SRC_URI += "file://0001-ov5640changed.patch"
+
+SRC_URI += "file://0005-Use-GPIO-controls-in-OV5640.patch"
+SRC_URI += "file://0001-ov5640changedfrommichael.patch"
 
 # for device tree
 #	change device tree from omap4-duovero-parlor.dts to omap4-duovero-stig.dts

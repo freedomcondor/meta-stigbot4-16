@@ -1,0 +1,105 @@
+From d796c12f5ceb6c76d80c017cd1d52581fbae307f Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Tue, 8 May 2018 12:36:08 +0200
+Subject: [PATCH] ov5640changedfrommichael
+
+---
+ drivers/media/i2c/ov5640.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/media/i2c/ov5640.c b/drivers/media/i2c/ov5640.c
+index d5b36f8f3302..5cffe6e835f0 100644
+--- a/drivers/media/i2c/ov5640.c
++++ b/drivers/media/i2c/ov5640.c
+@@ -2421,6 +2421,9 @@ static int ov5640_probe(struct i2c_client *client,
+ 	struct ov5640_dev *sensor;
+ 	int ret;
+ 
++									pr_err("Harry said: ov5640 start");
++
++
+ 	sensor = devm_kzalloc(dev, sizeof(*sensor), GFP_KERNEL);
+ 	if (!sensor)
+ 		return -ENOMEM;
+@@ -2439,6 +2442,9 @@ static int ov5640_probe(struct i2c_client *client,
+ 
+ 	sensor->ae_target = 52;
+ 
++									pr_err("ov5640 before parse endpoint");
++
++
+ 	endpoint = fwnode_graph_get_next_endpoint(
+ 		of_fwnode_handle(client->dev.of_node), NULL);
+ 	if (!endpoint) {
+@@ -2446,6 +2452,9 @@ static int ov5640_probe(struct i2c_client *client,
+ 		return -EINVAL;
+ 	}
+ 
++									pr_err("ov5640 middle parse endpoint");
++
++
+ 	ret = v4l2_fwnode_endpoint_parse(endpoint, &sensor->ep);
+ 	fwnode_handle_put(endpoint);
+ 	if (ret) {
+@@ -2453,6 +2462,9 @@ static int ov5640_probe(struct i2c_client *client,
+ 		return ret;
+ 	}
+ 
++									pr_err("ov5640 after parse endpoint");
++
++
+ 	/* request clock enable pin */
+ 	sensor->clock_enable_gpio =
+ 		devm_gpiod_get(dev,"clock-enable", GPIOD_OUT_HIGH);
+@@ -2464,6 +2476,10 @@ static int ov5640_probe(struct i2c_client *client,
+ 			sensor->xclk_freq);
+ 		return -EINVAL;
+ 	}
++	
++									pr_err("ov5640 after get clk");
++
++									pr_err("ov5640 before get powerdown and reset");
+ 
+ 	/* request optional power down pin */
+ 	sensor->pwdn_gpio =
+@@ -2481,6 +2497,9 @@ static int ov5640_probe(struct i2c_client *client,
+ 	if (ret)
+ 		return ret;
+ 
++
++									pr_err("ov5640 before get regulators");
++
+ 	/* request avdd supply enable pin */
+ 	sensor->avdd_enable_gpio =
+ 		devm_gpiod_get(dev,"avdd-enable", GPIOD_OUT_HIGH);
+@@ -2490,18 +2509,27 @@ static int ov5640_probe(struct i2c_client *client,
+ 
+ 	mutex_init(&sensor->lock);
+ 
++
++									pr_err("ov5640 before check chip id");
++
+ 	ret = ov5640_check_chip_id(sensor);
+ 	if (ret)
+ 		goto entity_cleanup;
+ 
++									pr_err("ov5640 after check chip id");
++
+ 	ret = ov5640_init_controls(sensor);
+ 	if (ret)
+ 		goto entity_cleanup;
+ 
++									pr_err("ov5640 after init control");
++
++
+ 	ret = v4l2_async_register_subdev(&sensor->sd);
+ 	if (ret)
+ 		goto free_ctrls;
+ 
++									pr_err("ov5640 after async");
+ 	return 0;
+ 
+ free_ctrls:
+-- 
+2.14.1
+
