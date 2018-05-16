@@ -1,7 +1,7 @@
 
 # for menuconfig
 #1. low level debug, for uart debug
-SRC_URI += "file://stig.config"
+#SRC_URI += "file://lowleveldebug.cfg"
 
 #2. pca963x, for leds under i2c2
 SRC_URI += "file://led-pca9632.cfg"
@@ -23,6 +23,8 @@ SRC_URI += "file://0001-vcnl-match.patch"
 #5. omap4iss
 SRC_URI += "file://v4l2_omap4iss.cfg"
 SRC_URI += "file://0001-omap4iss_dtschanged.patch"
+SRC_URI += "file://0001-omap4isshchanged.patch"
+SRC_URI += "file://0001-omap4iss-iss.h-changed.patch"
 SRC_URI += "file://0001-omap4iss_driverchanged.patch"
 SRC_URI += "file://devmem.cfg"	
 #	#create /dev/mem for rwmem debug
@@ -33,7 +35,7 @@ SRC_URI += "file://ov5640.cfg"
 #	#ov5640.cfg depends on v4l2, so it has to be after v4l2_omap4iss.cfg
 #SRC_URI += "file://0001-ov5640changed.patch"
 
-SRC_URI += "file://0005-Use-GPIO-controls-in-OV5640.patch"
+#SRC_URI += "file://0005-Use-GPIO-controls-in-OV5640.patch"
 SRC_URI += "file://0001-ov5640changedfrommichael.patch"
 
 # for device tree

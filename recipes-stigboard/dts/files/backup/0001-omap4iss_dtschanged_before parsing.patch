@@ -1,17 +1,17 @@
-From 0b3a6b5f249d727a3feb506d5fd6b609bd06fd70 Mon Sep 17 00:00:00 2001
+From 1a0be15c30bcf335b26a031ba6826b2d3aab2267 Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Tue, 15 May 2018 12:19:24 +0200
+Date: Tue, 8 May 2018 15:05:17 +0200
 Subject: [PATCH] omap4iss_dtschanged
 
 ---
- arch/arm/boot/dts/omap4.dtsi | 82 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 78 insertions(+), 4 deletions(-)
+ arch/arm/boot/dts/omap4.dtsi | 67 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 63 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm/boot/dts/omap4.dtsi b/arch/arm/boot/dts/omap4.dtsi
-index 475904894b86..decd6af8fa35 100644
+index 475904894b86..e036fcc62949 100644
 --- a/arch/arm/boot/dts/omap4.dtsi
 +++ b/arch/arm/boot/dts/omap4.dtsi
-@@ -746,9 +746,52 @@
+@@ -746,9 +746,37 @@
  			#iommu-cells = <0>;
  		};
  
@@ -41,21 +41,6 @@ index 475904894b86..decd6af8fa35 100644
 +
 +			dmas = <&sdma 9>, <&sdma 10>, <&sdma 12>, <&sdma 13>;
 +			dma-names = "1", "2", "3", "4";	// only 4 originally, 5 is a flag
-+
-+			/*
-+			ports {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+				port@0 {
-+					csi_endpoint: endpoint@0 {
-+						channel = "0";
-+						clock-lanes = <0>;
-+						data-lanes = <1>;
-+						remote-endpoint = <&ov5640_11>;
-+					};
-+				};
-+			};
-+			*/
 +		};
 +		/*
  		target-module@52000000 {
@@ -65,7 +50,7 @@ index 475904894b86..decd6af8fa35 100644
  			reg = <0x52000000 0x4>,
  			      <0x52000010 0x4>;
  			reg-names = "rev", "sysc";
-@@ -762,14 +805,45 @@
+@@ -762,14 +790,45 @@
  					<SYSC_IDLE_SMART>,
  					<SYSC_IDLE_SMART_WKUP>;
  			ti,sysc-delay-us = <2>;

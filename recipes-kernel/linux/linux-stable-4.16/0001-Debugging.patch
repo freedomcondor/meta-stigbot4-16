@@ -1,0 +1,97 @@
+From 9a6490083c5a900de54b0f1905e9a989ac1a38fb Mon Sep 17 00:00:00 2001
+From: Michael Allwright <allsey87@gmail.com>
+Date: Wed, 9 May 2018 15:19:51 +0200
+Subject: [PATCH] Debugging
+
+---
+ drivers/mfd/bb-avr.c           |  3 +++
+ drivers/tty/serial/sc16is7xx.c | 15 +++++++++++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mfd/bb-avr.c b/drivers/mfd/bb-avr.c
+index 0f69e8bc8e43..ea6fc1dc021e 100644
+--- a/drivers/mfd/bb-avr.c
++++ b/drivers/mfd/bb-avr.c
+@@ -271,6 +271,9 @@ static int bb_avr_receive_buf(struct serdev_device *serdev,
+ 	const unsigned char *end = buf + size;
+ 	u8 rx_byte = 0;
+ 
++   print_hex_dump(KERN_ERR, "bb_avr_receive_buf: ", DUMP_PREFIX_NONE,
++        	         16, 1, buf, size, false);
++
+ 	while(src < end || deframer->data_ptr < deframer->used_len) {
+ 		/* fetch or refetch the next byte */
+ 		if(deframer->data_ptr < deframer->used_len) {
+diff --git a/drivers/tty/serial/sc16is7xx.c b/drivers/tty/serial/sc16is7xx.c
+index 65792a3539d0..fb0100dbeed5 100644
+--- a/drivers/tty/serial/sc16is7xx.c
++++ b/drivers/tty/serial/sc16is7xx.c
+@@ -377,6 +377,9 @@ static void sc16is7xx_fifo_read(struct uart_port *port, unsigned int rxlen)
+ 	regcache_cache_bypass(s->regmap, true);
+ 	regmap_raw_read(s->regmap, addr, s->buf, rxlen);
+ 	regcache_cache_bypass(s->regmap, false);
++
++   print_hex_dump(KERN_ERR, "sc16is7xx_fifo_read: ", DUMP_PREFIX_NONE,
++        	         16, 1, s->buf, rxlen, false);
+ }
+ 
+ static void sc16is7xx_fifo_write(struct uart_port *port, u8 to_send)
+@@ -395,6 +398,9 @@ static void sc16is7xx_fifo_write(struct uart_port *port, u8 to_send)
+ 	regcache_cache_bypass(s->regmap, true);
+ 	regmap_raw_write(s->regmap, addr, s->buf, to_send);
+ 	regcache_cache_bypass(s->regmap, false);
++
++   print_hex_dump(KERN_ERR, "sc16is7xx_fifo_write: ", DUMP_PREFIX_NONE,
++        	         16, 1, s->buf, to_send, false);
+ }
+ 
+ static void sc16is7xx_port_update(struct uart_port *port, u8 reg,
+@@ -422,6 +428,7 @@ static int sc16is7xx_alloc_line(void)
+ 
+ static void sc16is7xx_power(struct uart_port *port, int on)
+ {
++   dev_err(port->dev, "On/off: %s\n", (on?"on":"off"));
+ 	sc16is7xx_port_update(port, SC16IS7XX_IER_REG,
+ 			      SC16IS7XX_IER_SLEEP_BIT,
+ 			      on ? 0 : SC16IS7XX_IER_SLEEP_BIT);
+@@ -765,10 +772,11 @@ static void sc16is7xx_reg_proc(struct kthread_work *ws)
+ 				      (one->port.mctrl & TIOCM_DTR) ?
+ 				      SC16IS7XX_MCR_DTR_BIT : 0);
+ 	}
+-	if (config.flags & SC16IS7XX_RECONF_IER)
++	if (config.flags & SC16IS7XX_RECONF_IER) {
++      dev_err(one->port.dev, "Updating SC16IS7XX_IER_REG: config.ier_clear = 0x%08X\n");
+ 		sc16is7xx_port_update(&one->port, SC16IS7XX_IER_REG,
+ 				      config.ier_clear, 0);
+-
++   }
+ 	if (config.flags & SC16IS7XX_RECONF_RS485)
+ 		sc16is7xx_reconf_rs485(&one->port);
+ }
+@@ -1004,6 +1012,7 @@ static int sc16is7xx_startup(struct uart_port *port)
+ 			      SC16IS7XX_EFCR_TXDISABLE_BIT,
+ 			      0);
+ 
++   dev_err(port->dev, "Enabling RX/TX interrupts\n");
+ 	/* Enable RX, TX interrupts */
+ 	val = SC16IS7XX_IER_RDI_BIT | SC16IS7XX_IER_THRI_BIT;
+ 	sc16is7xx_port_write(port, SC16IS7XX_IER_REG, val);
+@@ -1015,6 +1024,7 @@ static void sc16is7xx_shutdown(struct uart_port *port)
+ {
+ 	struct sc16is7xx_port *s = dev_get_drvdata(port->dev);
+ 
++   dev_err(port->dev, "Disable all interrupts\n");
+ 	/* Disable all interrupts */
+ 	sc16is7xx_port_write(port, SC16IS7XX_IER_REG, 0);
+ 	/* Disable TX/RX */
+@@ -1228,6 +1238,7 @@ static int sc16is7xx_probe(struct device *dev,
+ 		}
+ 
+ 		/* Disable all interrupts */
++      dev_err(dev, "Disable all interrupts\n");
+ 		sc16is7xx_port_write(&s->p[i].port, SC16IS7XX_IER_REG, 0);
+ 		/* Disable TX/RX */
+ 		sc16is7xx_port_write(&s->p[i].port, SC16IS7XX_EFCR_REG,
+-- 
+2.11.0
+

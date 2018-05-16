@@ -1,16 +1,16 @@
-From 36c8a6a372e50c25c4dcd0e6c8c912d0035d0521 Mon Sep 17 00:00:00 2001
+From 8cb6bb54273b3da45a76a5781eed1654632f36ad Mon Sep 17 00:00:00 2001
 From: Michael Allwright <allsey87@gmail.com>
-Date: Mon, 7 May 2018 17:38:31 +0200
-Subject: [PATCH] Add support for the BuilderBot AVRs
+Date: Wed, 9 May 2018 12:00:23 +0200
+Subject: [PATCH] mfd: Add support for the BuilderBot AVRs
 
 ---
- drivers/mfd/Kconfig  |   7 +
- drivers/mfd/Makefile |   1 +
- drivers/mfd/bb-avr.c | 404 +++++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/mfd/bb-avr.h |  49 +++++++
- 4 files changed, 461 insertions(+)
+ drivers/mfd/Kconfig        |   7 +
+ drivers/mfd/Makefile       |   1 +
+ drivers/mfd/bb-avr.c       | 396 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/mfd/bb-avr.h |  49 ++++++
+ 4 files changed, 453 insertions(+)
  create mode 100644 drivers/mfd/bb-avr.c
- create mode 100644 drivers/mfd/bb-avr.h
+ create mode 100644 include/linux/mfd/bb-avr.h
 
 diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
 index b860eb5aa194..e1f6986edfb6 100644
@@ -41,10 +41,10 @@ index d9d2cf0d32ef..3b6ae20365f2 100644
  
 diff --git a/drivers/mfd/bb-avr.c b/drivers/mfd/bb-avr.c
 new file mode 100644
-index 000000000000..35e654b2ce28
+index 000000000000..0f69e8bc8e43
 --- /dev/null
 +++ b/drivers/mfd/bb-avr.c
-@@ -0,0 +1,404 @@
+@@ -0,0 +1,396 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +
 +/*
@@ -61,14 +61,13 @@ index 000000000000..35e654b2ce28
 +#include <linux/init.h>
 +#include <linux/slab.h>
 +#include <linux/kernel.h>
++#include <linux/mfd/bb-avr.h>
 +#include <linux/module.h>
 +#include <linux/of.h>
 +#include <linux/of_device.h>
 +#include <linux/sched.h>
 +#include <linux/serdev.h>
 +#include <asm/unaligned.h>
-+
-+#include "bb_avr.h"
 +
 +#define BB_AVR_RX_BUFFER_SIZE 32
 +#define BB_AVR_TX_BUFFER_SIZE 32
@@ -399,13 +398,12 @@ index 000000000000..35e654b2ce28
 +{
 +	struct device *dev = &serdev->dev;
 +	struct bb_avr *avr;
-+	u32 baud;
++	u32 speed;
 +	int ret;
-+	u8 uptime[4];
 +
-+	if (of_property_read_u32(dev->of_node, "baud-rate", &baud)) {
++	if (of_property_read_u32(dev->of_node, "current-speed", &speed)) {
 +		dev_err(dev,
-+			"'baud-rate' is not specified in device node\n");
++			"'current-speed' is not specified in device node\n");
 +		return -EINVAL;
 +	}
 +
@@ -424,15 +422,9 @@ index 000000000000..35e654b2ce28
 +	if (ret)
 +		return ret;
 +
-+	serdev_device_set_baudrate(serdev, baud);
++	serdev_device_set_baudrate(serdev, speed);
 +
-+	ret = devm_of_platform_populate(dev);
-+
-+	
-+	bb_avr_exec(avr, BB_AVR_CMD_GET_UPTIME, NULL, 0, uptime, 4);
-+	dev_err(dev, "0x%02X 0x%02X 0x%02X 0x%02X", uptime[0], uptime[1], uptime[2], uptime[3]);
-+
-+	return ret;
++	return devm_of_platform_populate(dev);
 +}
 +
 +MODULE_DEVICE_TABLE(of, bb_avr_dt_ids);
@@ -449,11 +441,11 @@ index 000000000000..35e654b2ce28
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Michael Allwright <allsey87@gmail.com>");
 +MODULE_DESCRIPTION("BuilderBot AVR core driver");
-diff --git a/drivers/mfd/bb-avr.h b/drivers/mfd/bb-avr.h
+diff --git a/include/linux/mfd/bb-avr.h b/include/linux/mfd/bb-avr.h
 new file mode 100644
 index 000000000000..606ab52c58a9
 --- /dev/null
-+++ b/drivers/mfd/bb-avr.h
++++ b/include/linux/mfd/bb-avr.h
 @@ -0,0 +1,49 @@
 +/*
 + * Core definitions for the BuilderBot AVR MFD driver.

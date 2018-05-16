@@ -1,0 +1,51 @@
+From b2f1164abc0c2f98a53807470390c5a5fea7ff1d Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Tue, 15 May 2018 12:12:41 +0200
+Subject: [PATCH] 0001-omap4isshchanged
+
+---
+ include/linux/platform_data/media/omap4iss.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/include/linux/platform_data/media/omap4iss.h b/include/linux/platform_data/media/omap4iss.h
+index 2a511a8fcda7..f03d2f98c7a9 100644
+--- a/include/linux/platform_data/media/omap4iss.h
++++ b/include/linux/platform_data/media/omap4iss.h
+@@ -45,6 +45,7 @@ struct iss_csi2_platform_data {
+ 	struct iss_csiphy_lanes_cfg lanecfg;
+ };
+ 
++/* ---- may not be used------------------- */
+ struct iss_subdev_i2c_board_info {
+ 	struct i2c_board_info *board_info;
+ 	int i2c_adapter_id;
+@@ -57,10 +58,26 @@ struct iss_v4l2_subdevs_group {
+ 		struct iss_csi2_platform_data csi2;
+ 	} bus; /* gcc < 4.6.0 chokes on anonymous union initializers */
+ };
++/* ---- end may not be used------------------- */
+ 
+ struct iss_platform_data {
+ 	struct iss_v4l2_subdevs_group *subdevs;
+ 	void (*set_constraints)(struct iss_device *iss, bool enable);
+ };
+ 
++/* ---- for endpoint parsing------------------- */
++struct iss_bus_cfg {
++	enum iss_interface_type interface;
++	union {
++		struct iss_csi2_platform_data csi2;
++	} bus; /* gcc < 4.6.0 chokes on anonymous union initializers */
++};
++
++struct iss_platform_subdev {
++	struct i2c_board_info *board_info;
++	int i2c_adapter_id;
++	struct iss_bus_cfg *bus;
++};
++/* ---- end for endpoint parsing------------------- */
++
+ #endif
+-- 
+2.14.1
+

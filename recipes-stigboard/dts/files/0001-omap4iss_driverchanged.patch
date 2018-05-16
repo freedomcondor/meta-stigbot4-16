@@ -1,17 +1,29 @@
-From 96d80e2d028b0967aabf49579644c3aaf560ec71 Mon Sep 17 00:00:00 2001
+From 2a13b6c05437b3f269ec924f50d9fb1ac6cded2f Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Tue, 8 May 2018 15:30:14 +0200
+Date: Tue, 15 May 2018 12:25:02 +0200
 Subject: [PATCH] omap4iss_driverchanged
 
 ---
- drivers/staging/media/omap4iss/iss.c | 76 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 75 insertions(+), 1 deletion(-)
+ drivers/staging/media/omap4iss/iss.c | 238 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 237 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/staging/media/omap4iss/iss.c b/drivers/staging/media/omap4iss/iss.c
-index b1036baebb03..ac761be60b65 100644
+index b1036baebb03..93078de70036 100644
 --- a/drivers/staging/media/omap4iss/iss.c
 +++ b/drivers/staging/media/omap4iss/iss.c
-@@ -28,6 +28,8 @@
+@@ -14,6 +14,7 @@
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+ #include <linux/device.h>
++#include <linux/of_device.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/i2c.h>
+ #include <linux/interrupt.h>
+@@ -25,9 +26,12 @@
+ #include <linux/vmalloc.h>
+ 
+ #include <media/v4l2-common.h>
++#include <media/v4l2-fwnode.h>
  #include <media/v4l2-device.h>
  #include <media/v4l2-ctrls.h>
  
@@ -20,7 +32,7 @@ index b1036baebb03..ac761be60b65 100644
  #include "iss.h"
  #include "iss_regs.h"
  
-@@ -841,7 +843,6 @@ static int iss_get_clocks(struct iss_device *iss)
+@@ -841,7 +845,6 @@ static int iss_get_clocks(struct iss_device *iss)
  		dev_err(iss->dev, "Unable to get iss_ctrlclk clock info\n");
  		return PTR_ERR(iss->iss_ctrlclk);
  	}
@@ -28,7 +40,7 @@ index b1036baebb03..ac761be60b65 100644
  	return 0;
  }
  
-@@ -866,12 +867,17 @@ struct iss_device *omap4iss_get(struct iss_device *iss)
+@@ -866,12 +869,17 @@ struct iss_device *omap4iss_get(struct iss_device *iss)
  	if (iss->ref_count > 0)
  		goto out;
  
@@ -46,23 +58,24 @@ index b1036baebb03..ac761be60b65 100644
  
  out:
  	if (__iss)
-@@ -993,12 +999,15 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -993,12 +1001,16 @@ static int iss_register_entities(struct iss_device *iss)
  		sizeof(iss->media_dev.model));
  	iss->media_dev.hw_revision = iss->revision;
  	iss->media_dev.ops = &iss_media_ops;
 +	media_device_init(&iss->media_dev);
 +
++	/*
  	ret = media_device_register(&iss->media_dev);
  	if (ret < 0) {
  		dev_err(iss->dev, "Media device registration failed (%d)\n",
  			ret);
  		return ret;
  	}
-+	
++	*/
  
  	iss->v4l2_dev.mdev = &iss->media_dev;
  	ret = v4l2_device_register(iss->dev, &iss->v4l2_dev);
-@@ -1030,6 +1039,7 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1030,6 +1042,7 @@ static int iss_register_entities(struct iss_device *iss)
  		goto done;
  
  	/* Register external entities */
@@ -70,7 +83,7 @@ index b1036baebb03..ac761be60b65 100644
  	for (subdevs = pdata->subdevs; subdevs && subdevs->subdevs; ++subdevs) {
  		struct v4l2_subdev *sensor;
  		struct media_entity *input;
-@@ -1042,10 +1052,12 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1042,10 +1055,12 @@ static int iss_register_entities(struct iss_device *iss)
  
  		sensor->host_priv = subdevs;
  
@@ -83,7 +96,7 @@ index b1036baebb03..ac761be60b65 100644
  		switch (subdevs->interface) {
  		case ISS_INTERFACE_CSI2A_PHY1:
  			input = &iss->csi2a.subdev.entity;
-@@ -1073,9 +1085,14 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1073,9 +1088,14 @@ static int iss_register_entities(struct iss_device *iss)
  		if (ret < 0)
  			goto done;
  	}
@@ -98,7 +111,156 @@ index b1036baebb03..ac761be60b65 100644
  done:
  	if (ret < 0)
  		iss_unregister_entities(iss);
-@@ -1207,13 +1224,19 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1200,6 +1220,148 @@ static int iss_initialize_modules(struct iss_device *iss)
+ 	return ret;
+ }
+ 
++static int iss_link_entity(
++    struct iss_device *iss, struct media_entity *entity,
++    enum iss_interface_type interface)
++{
++    struct media_entity *input;
++    unsigned int flags;
++    unsigned int pad;
++    unsigned int i;
++
++    /* Connect the sensor to the correct interface module.
++     * serial sensors are connected to the CSI2a or CSI2b
++     */
++    switch (interface) {
++
++    case ISS_INTERFACE_CSI2A_PHY1:
++        input = &iss->csi2a.subdev.entity;
++        pad = CSI2_PAD_SINK;
++        flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED;
++        break;
++
++    case ISS_INTERFACE_CSI2B_PHY2:
++        input = &iss->csi2b.subdev.entity;
++        pad = CSI2_PAD_SINK;
++        flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED;
++        break;
++
++    default:
++        dev_err(iss->dev, "%s: invalid interface type %u\n", __func__,
++            interface);
++        return -EINVAL;
++    }
++
++    for (i = 0; i < entity->num_pads; i++) {
++        if (entity->pads[i].flags & MEDIA_PAD_FL_SOURCE)
++            break;
++    }
++    if (i == entity->num_pads) {
++        dev_err(iss->dev, "%s: no source pad in external entity\n",
++            __func__);
++        return -EINVAL;
++    }
++
++    return media_create_pad_link(entity, i, input, pad, flags);
++}
++
++static int iss_fwnode_parse(struct device *dev,
++							struct v4l2_fwnode_endpoint *vep,
++							struct v4l2_async_subdev *asd)
++{
++	struct iss_async_subdev *isd =
++			container_of(asd, struct iss_async_subdev, asd);
++	struct iss_bus_cfg *buscfg = &isd->bus;
++	unsigned int i, lanes;
++
++	pr_err("Harry said start parsing");
++	dev_dbg(dev, "parsing endpoint %pOF, interface %u\n",
++			to_of_node(vep->base.local_fwnode), vep->base.port);
++	pr_err("parsing endpoint %pOF, interface %u\n",
++			to_of_node(vep->base.local_fwnode), vep->base.port);
++
++	switch (vep->base.port)
++	{
++		case ISS_INTERFACE_CSI2A_PHY1:
++			buscfg->interface = ISS_INTERFACE_CSI2A_PHY1;
++			lanes = ISS_CSIPHY1_NUM_DATA_LANES;
++			break;
++		case ISS_INTERFACE_CSI2B_PHY2:
++			buscfg->interface = ISS_INTERFACE_CSI2B_PHY2;
++			lanes = ISS_CSIPHY2_NUM_DATA_LANES;
++			break;
++		default:
++			dev_warn(dev, "parsing endpoint: invalid interface %u\n", vep->base.port);
++			return -EINVAL;
++	}
++
++	buscfg->bus.csi2.lanecfg.clk.pos = vep->bus.mipi_csi2.clock_lane;
++	buscfg->bus.csi2.lanecfg.clk.pol =
++								vep->bus.mipi_csi2.lane_polarities[0];
++	dev_info(dev, "clock lane polarity %u, pos %u\n",
++					buscfg->bus.csi2.lanecfg.clk.pol,
++					buscfg->bus.csi2.lanecfg.clk.pos);
++
++	for (i = 0; i < lanes; i++)
++	{
++		buscfg->bus.csi2.lanecfg.data[i].pos =
++						vep->bus.mipi_csi2.data_lanes[i];
++		buscfg->bus.csi2.lanecfg.data[i].pol =
++						vep->bus.mipi_csi2.lane_polarities[i + 1];
++		dev_info(dev, "data lane %u polarity %u, pos %u\n", i,
++								buscfg->bus.csi2.lanecfg.data[i].pol,
++								buscfg->bus.csi2.lanecfg.data[i].pos);
++	}
++
++	/*
++	 * FIXME: now we assume the CRC is always there.
++	 * Implement a way to obtain this information from the
++	 * sensor. Frame descriptors, perhaps?
++	 */
++	buscfg->bus.csi2.crc = 0;
++
++	return 0;
++}
++
++static int iss_subdev_notifier_complete(struct v4l2_async_notifier *async)
++{
++	struct iss_device *iss = container_of(async, struct iss_device, notifier);
++	struct v4l2_device *v4l2_dev = &iss->v4l2_dev;
++	struct v4l2_subdev *sd;
++	int ret;
++
++	pr_err("Harry is in complete");
++
++	ret = media_entity_enum_init(&iss->crashed, &iss->media_dev);
++	if (ret)
++		return ret;
++
++	list_for_each_entry(sd, &v4l2_dev->subdevs, list) {
++		if (sd->notifier != &iss->notifier)
++			continue;
++
++		pr_err("Harry found a notifier in subdev list");
++		ret = iss_link_entity(iss, &sd->entity, v4l2_subdev_to_bus_cfg(sd)->interface);
++		pr_err("Harry is linking this notifier, ret = %d",ret);
++		if (ret < 0)
++			return ret;
++
++		pr_err("Harry linked this notifier");
++	}
++
++	ret = v4l2_device_register_subdev_nodes(&iss->v4l2_dev);
++	if (ret < 0)
++		return ret;
++
++	pr_err("Harry is leaving complete");
++
++	return media_device_register(&iss->media_dev);
++}
++
++static const struct v4l2_async_notifier_operations iss_subdev_notifier_ops = {
++	.complete = iss_subdev_notifier_complete,
++};
++
+ static int iss_probe(struct platform_device *pdev)
+ {
+ 	struct iss_platform_data *pdata = pdev->dev.platform_data;
+@@ -1207,13 +1369,19 @@ static int iss_probe(struct platform_device *pdev)
  	unsigned int i;
  	int ret;
  
@@ -118,7 +280,24 @@ index b1036baebb03..ac761be60b65 100644
  	mutex_init(&iss->iss_mutex);
  
  	iss->dev = &pdev->dev;
-@@ -1235,21 +1258,45 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1225,6 +1393,16 @@ static int iss_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, iss);
+ 
++	/*-------------------------------------------------------------*/
++		// parse endpoint
++	ret = v4l2_async_notifier_parse_fwnode_endpoints(
++				&pdev->dev, &iss->notifier, sizeof(struct iss_async_subdev),
++				iss_fwnode_parse);
++	//ret = iss_of_parse_nodes(&pdev->dev, &iss->notifier);
++	if (ret < 0)
++		goto error;
++	/*-------------------------------------------------------------*/
++
+ 	/*
+ 	 * TODO: When implementing DT support switch to syscon regmap lookup by
+ 	 * phandle.
+@@ -1235,21 +1413,45 @@ static int iss_probe(struct platform_device *pdev)
  		goto error;
  	}
  
@@ -164,7 +343,7 @@ index b1036baebb03..ac761be60b65 100644
  
  	iss->revision = iss_reg_read(iss, OMAP4_ISS_MEM_TOP, ISS_HL_REVISION);
  	dev_info(iss->dev, "Revision %08x found\n", iss->revision);
-@@ -1270,6 +1317,8 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1270,6 +1472,8 @@ static int iss_probe(struct platform_device *pdev)
  	if (ret < 0)
  		goto error_iss;
  
@@ -173,7 +352,7 @@ index b1036baebb03..ac761be60b65 100644
  	ret = iss_isp_reset(iss);
  	if (ret < 0)
  		goto error_iss;
-@@ -1293,27 +1342,40 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1293,27 +1497,46 @@ static int iss_probe(struct platform_device *pdev)
  		goto error_iss;
  	}
  
@@ -200,10 +379,16 @@ index b1036baebb03..ac761be60b65 100644
 +
  	ret = iss_create_links(iss);
  	if (ret < 0)
- 		goto error_entities;
- 
++		goto error_entities;
++
 +										pr_err("iss_probe after create links");
 +
++	iss->notifier.ops = &iss_subdev_notifier_ops;
++
++	ret = v4l2_async_notifier_register(&iss->v4l2_dev, &iss->notifier);
++	if (ret)
+ 		goto error_entities;
+ 
  	omap4iss_put(iss);
  
 +										pr_err("iss_probe after putput");
@@ -214,15 +399,18 @@ index b1036baebb03..ac761be60b65 100644
  error_entities:
  	iss_unregister_entities(iss);
  	media_entity_enum_cleanup(&iss->crashed);
-@@ -1324,6 +1386,7 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1322,8 +1545,10 @@ static int iss_probe(struct platform_device *pdev)
+ error_iss:
+ 	omap4iss_put(iss);
  error:
++	v4l2_async_notifier_cleanup(&iss->notifier);
  	mutex_destroy(&iss->iss_mutex);
  
 +										pr_err("iss_probe before return ret: %d",ret);
  	return ret;
  }
  
-@@ -1342,6 +1405,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
+@@ -1342,6 +1567,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
  	{ "omap4iss", 0 },
  	{ },
  };
@@ -239,7 +427,7 @@ index b1036baebb03..ac761be60b65 100644
  MODULE_DEVICE_TABLE(platform, omap4iss_id_table);
  
  static struct platform_driver iss_driver = {
-@@ -1350,6 +1423,7 @@ static struct platform_driver iss_driver = {
+@@ -1350,6 +1585,7 @@ static struct platform_driver iss_driver = {
  	.id_table	= omap4iss_id_table,
  	.driver = {
  		.name	= "omap4iss",

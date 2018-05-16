@@ -12,6 +12,9 @@ IMAGE_INSTALL += " netinterface \
     lua \
     argos \
     pmstatus \
+    picocom \
+    yavta \
+    i2c-tools \
 "
 
 CORE_OS = " \

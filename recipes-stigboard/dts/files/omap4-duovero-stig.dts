@@ -178,6 +178,31 @@
 
 		interrupt-parent = <&gpio2>;
 		interrupts = <12 IRQ_TYPE_EDGE_FALLING>; /* gpmc_a20.gpio_44 */
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		serial@0 {
+			reg = <0>;
+			pm: atmega328p {
+				compatible = "ulb,bb-avr";
+				current-speed = <57600>;
+				uptime {
+					compatible = "ulb,bb-avr-uptime";
+				};
+			}; 
+		}; 
+
+		serial@1 {
+			reg = <1>;
+			sensact: atmega328p {
+				compatible = "ulb,bb-avr";
+				current-speed = <57600>;
+				uptime {
+					compatible = "ulb,bb-avr-uptime";
+				};
+			};
+		};
 	};
 
 	uart78: sc16is762@49 {
@@ -358,7 +383,7 @@
 	};
 
 	i2c-mux@70 {
-		compatible = "nxp,pca9542";	// need the compatible
+		compatible = "nxp,pca9542";	
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0x70>;
@@ -375,11 +400,11 @@
 				#gpio-cells = <2>;
 			};
 
-			ov5640_flash: pca9633@60 {	// check the address
+			ov5640_flash: pca9633@60 {	
 				compatible = "nxp,pca9633";
 				#address-cells = <1>;
 				#size-cells = <0>;
-				reg = <0x60>;		// check the address
+				reg = <0x60>;	
 
 				tl@0{
 					label = "ov5640_1_flash_tl";
@@ -437,6 +462,20 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&iss_csi21_pins>;
 
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			csi_endpoint: endpoint@0 {
+				channel = "0";
+				clock-lanes = <0>;
+				data-lanes = <1>;
+				remote-endpoint = <&ov5640_11>;
+			};
+		};
+	};
+	/*
 	csi21: csi2 {
 		port {
 			csi_endpoint: endpoint {
@@ -447,5 +486,6 @@
 			};
 		};
 	};
+	*/
 };
 

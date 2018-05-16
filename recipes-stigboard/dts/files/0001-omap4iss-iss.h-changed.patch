@@ -1,0 +1,54 @@
+From 7a53c9baa27e6f22428fee5a66d628ad718b9809 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Tue, 15 May 2018 12:23:57 +0200
+Subject: [PATCH] omap4iss-iss.h-changed
+
+---
+ drivers/staging/media/omap4iss/iss.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/staging/media/omap4iss/iss.h b/drivers/staging/media/omap4iss/iss.h
+index 760ee27da704..b58a52748596 100644
+--- a/drivers/staging/media/omap4iss/iss.h
++++ b/drivers/staging/media/omap4iss/iss.h
+@@ -16,6 +16,7 @@
+ 
+ #include <media/v4l2-device.h>
+ #include <media/v4l2-mc.h>
++#include <media/v4l2-async.h>
+ 
+ #include <linux/device.h>
+ #include <linux/io.h>
+@@ -88,6 +89,7 @@ struct iss_reg {
+  */
+ struct iss_device {
+ 	struct v4l2_device v4l2_dev;
++	struct v4l2_async_notifier notifier;
+ 	struct media_device media_dev;
+ 	struct device *dev;
+ 	u32 revision;
+@@ -121,8 +123,21 @@ struct iss_device {
+ 
+ 	unsigned int subclk_resources;
+ 	unsigned int isp_subclk_resources;
++
++#define ISS_MAX_SUBDEVS        2
++	struct v4l2_subdev *subdevs[ISS_MAX_SUBDEVS];
+ };
+ 
++struct iss_async_subdev {
++	struct v4l2_async_subdev asd;
++	struct iss_bus_cfg bus;
++
++	struct v4l2_subdev *sd;
++};
++
++#define v4l2_subdev_to_bus_cfg(sd) \
++	(&container_of((sd)->asd, struct iss_async_subdev, asd)->bus)
++
+ #define v4l2_dev_to_iss_device(dev) \
+ 	container_of(dev, struct iss_device, v4l2_dev)
+ 
+-- 
+2.14.1
+
