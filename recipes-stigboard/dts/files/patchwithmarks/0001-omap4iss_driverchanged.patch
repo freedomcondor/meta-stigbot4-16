@@ -1,14 +1,14 @@
-From 2a13b6c05437b3f269ec924f50d9fb1ac6cded2f Mon Sep 17 00:00:00 2001
+From 13063b52b2ed9e86b26aec68a922bc061bcd8ca5 Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Tue, 15 May 2018 12:25:02 +0200
+Date: Tue, 29 May 2018 14:59:46 +0200
 Subject: [PATCH] omap4iss_driverchanged
 
 ---
- drivers/staging/media/omap4iss/iss.c | 238 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 237 insertions(+), 1 deletion(-)
+ drivers/staging/media/omap4iss/iss.c | 283 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 279 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/staging/media/omap4iss/iss.c b/drivers/staging/media/omap4iss/iss.c
-index b1036baebb03..93078de70036 100644
+index b1036baebb03..0141b9066dcf 100644
 --- a/drivers/staging/media/omap4iss/iss.c
 +++ b/drivers/staging/media/omap4iss/iss.c
 @@ -14,6 +14,7 @@
@@ -27,12 +27,84 @@ index b1036baebb03..93078de70036 100644
  #include <media/v4l2-device.h>
  #include <media/v4l2-ctrls.h>
  
-+//#include <linux/pm_runtime.h>
++#include <linux/pm_runtime.h>
 +
  #include "iss.h"
  #include "iss_regs.h"
  
-@@ -841,7 +845,6 @@ static int iss_get_clocks(struct iss_device *iss)
+@@ -130,6 +134,8 @@ int omap4iss_get_external_info(struct iss_pipeline *pipe,
+ 		container_of(pipe, struct iss_video, pipe)->iss;
+ 	struct v4l2_subdev_format fmt;
+ 	struct v4l2_ctrl *ctrl;
++	//struct v4l2_ext_controls ctrls;
++	//struct v4l2_ext_control ctrl;
+ 	int ret;
+ 
+ 	if (!pipe->external)
+@@ -149,16 +155,32 @@ int omap4iss_get_external_info(struct iss_pipeline *pipe,
+ 
+ 	pipe->external_bpp = omap4iss_video_format_info(fmt.format.code)->bpp;
+ 
++	/*
++	memset(&ctrls, 0, sizeof(ctrls));
++	memset(&ctrl, 0, sizeof(ctrl));
++	ctrl.id = V4L2_CID_PIXEL_RATE;
++	ctrls.count = 1;
++	ctrls.controls = &ctrl;
++	*/
++
++								pr_err("Harry said: omap4iss_get_external_info handler = %x",pipe->external->ctrl_handler);
++								dump_stack();
++
++	//ret = v4l2_g_ext_ctrls(pipe->external->ctrl_handler, &ctrls);
++
+ 	ctrl = v4l2_ctrl_find(pipe->external->ctrl_handler,
+ 			      V4L2_CID_PIXEL_RATE);
+ 	if (!ctrl) {
++	//if (ret < 0) {
+ 		dev_warn(iss->dev, "no pixel rate control in subdev %s\n",
+ 			 pipe->external->name);
+ 		return -EPIPE;
+ 	}
+ 
+ 	pipe->external_rate = v4l2_ctrl_g_ctrl_int64(ctrl);
+-
++	//pipe->external_rate = ctrl.value64;
++	dev_info(iss->dev, "subdev %s pixel rate = %u\n",
++			pipe->external->name, pipe->external_rate);
+ 	return 0;
+ }
+ 
+@@ -802,6 +824,8 @@ static int iss_enable_clocks(struct iss_device *iss)
+ {
+ 	int ret;
+ 
++	pm_runtime_resume(iss->dev);
++	/*
+ 	ret = clk_enable(iss->iss_fck);
+ 	if (ret) {
+ 		dev_err(iss->dev, "clk_enable iss_fck failed\n");
+@@ -814,6 +838,7 @@ static int iss_enable_clocks(struct iss_device *iss)
+ 		clk_disable(iss->iss_fck);
+ 		return ret;
+ 	}
++	*/
+ 
+ 	return 0;
+ }
+@@ -824,8 +849,11 @@ static int iss_enable_clocks(struct iss_device *iss)
+  */
+ static void iss_disable_clocks(struct iss_device *iss)
+ {
++	pm_runtime_suspend(iss->dev);
++	/*
+ 	clk_disable(iss->iss_ctrlclk);
+ 	clk_disable(iss->iss_fck);
++	*/
+ }
+ 
+ static int iss_get_clocks(struct iss_device *iss)
+@@ -841,7 +869,6 @@ static int iss_get_clocks(struct iss_device *iss)
  		dev_err(iss->dev, "Unable to get iss_ctrlclk clock info\n");
  		return PTR_ERR(iss->iss_ctrlclk);
  	}
@@ -40,17 +112,20 @@ index b1036baebb03..93078de70036 100644
  	return 0;
  }
  
-@@ -866,12 +869,17 @@ struct iss_device *omap4iss_get(struct iss_device *iss)
+@@ -866,12 +893,20 @@ struct iss_device *omap4iss_get(struct iss_device *iss)
  	if (iss->ref_count > 0)
  		goto out;
  
 +											pr_err("omap4iss_get before enable clocks");
 +											dump_stack();
 +
++	/*
  	if (iss_enable_clocks(iss) < 0) {
  		__iss = NULL;
  		goto out;
  	}
++	*/
++	pm_runtime_resume(iss->dev);
  
 +											pr_err("omap4iss_get before enable interrupts");
  	iss_enable_interrupts(iss);
@@ -58,7 +133,19 @@ index b1036baebb03..93078de70036 100644
  
  out:
  	if (__iss)
-@@ -993,12 +1001,16 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -903,8 +938,10 @@ void omap4iss_put(struct iss_device *iss)
+ 		 */
+ 		if (!media_entity_enum_empty(&iss->crashed))
+ 			iss_reset(iss);
+-		iss_disable_clocks(iss);
++		//iss_disable_clocks(iss);
+ 	}
++	pm_runtime_suspend(iss->dev);
++
+ 	mutex_unlock(&iss->iss_mutex);
+ }
+ 
+@@ -993,12 +1030,16 @@ static int iss_register_entities(struct iss_device *iss)
  		sizeof(iss->media_dev.model));
  	iss->media_dev.hw_revision = iss->revision;
  	iss->media_dev.ops = &iss_media_ops;
@@ -75,7 +162,7 @@ index b1036baebb03..93078de70036 100644
  
  	iss->v4l2_dev.mdev = &iss->media_dev;
  	ret = v4l2_device_register(iss->dev, &iss->v4l2_dev);
-@@ -1030,6 +1042,7 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1030,6 +1071,7 @@ static int iss_register_entities(struct iss_device *iss)
  		goto done;
  
  	/* Register external entities */
@@ -83,7 +170,7 @@ index b1036baebb03..93078de70036 100644
  	for (subdevs = pdata->subdevs; subdevs && subdevs->subdevs; ++subdevs) {
  		struct v4l2_subdev *sensor;
  		struct media_entity *input;
-@@ -1042,10 +1055,12 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1042,10 +1084,12 @@ static int iss_register_entities(struct iss_device *iss)
  
  		sensor->host_priv = subdevs;
  
@@ -96,7 +183,7 @@ index b1036baebb03..93078de70036 100644
  		switch (subdevs->interface) {
  		case ISS_INTERFACE_CSI2A_PHY1:
  			input = &iss->csi2a.subdev.entity;
-@@ -1073,9 +1088,14 @@ static int iss_register_entities(struct iss_device *iss)
+@@ -1073,9 +1117,14 @@ static int iss_register_entities(struct iss_device *iss)
  		if (ret < 0)
  			goto done;
  	}
@@ -111,7 +198,7 @@ index b1036baebb03..93078de70036 100644
  done:
  	if (ret < 0)
  		iss_unregister_entities(iss);
-@@ -1200,6 +1220,148 @@ static int iss_initialize_modules(struct iss_device *iss)
+@@ -1200,6 +1249,148 @@ static int iss_initialize_modules(struct iss_device *iss)
  	return ret;
  }
  
@@ -260,7 +347,7 @@ index b1036baebb03..93078de70036 100644
  static int iss_probe(struct platform_device *pdev)
  {
  	struct iss_platform_data *pdata = pdev->dev.platform_data;
-@@ -1207,13 +1369,19 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1207,13 +1398,19 @@ static int iss_probe(struct platform_device *pdev)
  	unsigned int i;
  	int ret;
  
@@ -280,7 +367,7 @@ index b1036baebb03..93078de70036 100644
  	mutex_init(&iss->iss_mutex);
  
  	iss->dev = &pdev->dev;
-@@ -1225,6 +1393,16 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1225,6 +1422,16 @@ static int iss_probe(struct platform_device *pdev)
  
  	platform_set_drvdata(pdev, iss);
  
@@ -297,7 +384,7 @@ index b1036baebb03..93078de70036 100644
  	/*
  	 * TODO: When implementing DT support switch to syscon regmap lookup by
  	 * phandle.
-@@ -1235,21 +1413,45 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1235,21 +1442,50 @@ static int iss_probe(struct platform_device *pdev)
  		goto error;
  	}
  
@@ -322,12 +409,17 @@ index b1036baebb03..93078de70036 100644
  
 +										pr_err("iss_probe after memresource top");
 +
++	/*
  	ret = iss_get_clocks(iss);
  	if (ret < 0)
  		goto error;
- 
++	*/
++
 +										pr_err("iss_probe after get clock");
 +
++	pm_runtime_enable(iss->dev);
++	pm_runtime_get_sync(&pdev->dev);
+ 
  	if (!omap4iss_get(iss))
  		goto error;
  
@@ -343,7 +435,7 @@ index b1036baebb03..93078de70036 100644
  
  	iss->revision = iss_reg_read(iss, OMAP4_ISS_MEM_TOP, ISS_HL_REVISION);
  	dev_info(iss->dev, "Revision %08x found\n", iss->revision);
-@@ -1270,6 +1472,8 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1270,6 +1506,8 @@ static int iss_probe(struct platform_device *pdev)
  	if (ret < 0)
  		goto error_iss;
  
@@ -352,7 +444,7 @@ index b1036baebb03..93078de70036 100644
  	ret = iss_isp_reset(iss);
  	if (ret < 0)
  		goto error_iss;
-@@ -1293,27 +1497,46 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1293,27 +1531,51 @@ static int iss_probe(struct platform_device *pdev)
  		goto error_iss;
  	}
  
@@ -379,27 +471,33 @@ index b1036baebb03..93078de70036 100644
 +
  	ret = iss_create_links(iss);
  	if (ret < 0)
-+		goto error_entities;
-+
+ 		goto error_entities;
+ 
+-	omap4iss_put(iss);
 +										pr_err("iss_probe after create links");
 +
 +	iss->notifier.ops = &iss_subdev_notifier_ops;
 +
 +	ret = v4l2_async_notifier_register(&iss->v4l2_dev, &iss->notifier);
 +	if (ret)
- 		goto error_entities;
- 
- 	omap4iss_put(iss);
- 
-+										pr_err("iss_probe after putput");
++		goto error_entities;
 +
++	/*
++	iss->notifier.bound = iss_subdev_notifier_bound;
++	iss->notifier.complete = iss_subdev_notifier_complete;
++	*/
++
++	//omap4iss_put(iss);
++
++										pr_err("iss_probe after putput");
+ 
  	return 0;
  
 +
  error_entities:
  	iss_unregister_entities(iss);
  	media_entity_enum_cleanup(&iss->crashed);
-@@ -1322,8 +1545,10 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1322,8 +1584,10 @@ static int iss_probe(struct platform_device *pdev)
  error_iss:
  	omap4iss_put(iss);
  error:
@@ -410,7 +508,7 @@ index b1036baebb03..93078de70036 100644
  	return ret;
  }
  
-@@ -1342,6 +1567,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
+@@ -1342,6 +1606,16 @@ static const struct platform_device_id omap4iss_id_table[] = {
  	{ "omap4iss", 0 },
  	{ },
  };
@@ -427,7 +525,7 @@ index b1036baebb03..93078de70036 100644
  MODULE_DEVICE_TABLE(platform, omap4iss_id_table);
  
  static struct platform_driver iss_driver = {
-@@ -1350,6 +1585,7 @@ static struct platform_driver iss_driver = {
+@@ -1350,6 +1624,7 @@ static struct platform_driver iss_driver = {
  	.id_table	= omap4iss_id_table,
  	.driver = {
  		.name	= "omap4iss",

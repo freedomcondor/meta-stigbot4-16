@@ -1,0 +1,79 @@
+From 3d69b64cfa0c1b05ca5e0342833651da4d1ab5b8 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Tue, 29 May 2018 12:59:32 +0200
+Subject: [PATCH] syscchanged
+
+---
+ drivers/bus/ti-sysc.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/bus/ti-sysc.c b/drivers/bus/ti-sysc.c
+index cdaeeea7999c..a94136708663 100644
+--- a/drivers/bus/ti-sysc.c
++++ b/drivers/bus/ti-sysc.c
+@@ -481,15 +481,21 @@ static int __maybe_unused sysc_runtime_resume(struct device *dev)
+ 	struct sysc *ddata;
+ 	int i, error;
+ 
++								pr_err("sysc_runtime_resume");
+ 	ddata = dev_get_drvdata(dev);
+ 
+ 	if (ddata->legacy_mode)
++								{
++								pr_err("sysc_runtime_resume legacy mode returned");
+ 		return 0;
++								}
+ 
++								pr_err("sysc_runtime_resume, before clock");
+ 	for (i = 0; i < SYSC_MAX_CLOCKS; i++) {
+ 		if (IS_ERR_OR_NULL(ddata->clocks[i]))
+ 			continue;
+ 		error = clk_enable(ddata->clocks[i]);
++								pr_err("sysc_runtime_resume, clk_enable, ret = %d",error);
+ 		if (error)
+ 			return error;
+ 	}
+@@ -625,8 +631,13 @@ static int sysc_init_dts_quirks(struct sysc *ddata)
+ 	int i, len, error;
+ 	u32 val;
+ 
++										pr_err("i am sysc_init_dts_quirks");
++
+ 	ddata->legacy_mode = of_get_property(np, "ti,hwmods", NULL);
+ 
++										pr_err("legacy mode = %s",ddata->legacy_mode);
++				
++
+ 	for (i = 0; i < ARRAY_SIZE(sysc_dts_quirks); i++) {
+ 		prop = of_get_property(np, sysc_dts_quirks[i].name, &len);
+ 		if (!prop)
+@@ -885,20 +896,26 @@ static int sysc_probe(struct platform_device *pdev)
+ 	struct sysc *ddata;
+ 	int error;
+ 
++									pr_err("i am sysc probe");
++
+ 	ddata = devm_kzalloc(&pdev->dev, sizeof(*ddata), GFP_KERNEL);
+ 	if (!ddata)
+ 		return -ENOMEM;
+ 
++									pr_err("sysc probe after kzalloc");
+ 	ddata->dev = &pdev->dev;
+ 	platform_set_drvdata(pdev, ddata);
+ 
++									pr_err("sysc probe before init match");
+ 	error = sysc_init_match(ddata);
+ 	if (error)
+ 		return error;
+ 
++									pr_err("sysc probe before init dts");
+ 	error = sysc_init_dts_quirks(ddata);
+ 	if (error)
+ 		goto unprepare;
++									pr_err("sysc probe after init dts");
+ 
+ 	error = sysc_get_clocks(ddata);
+ 	if (error)
+-- 
+2.14.1
+

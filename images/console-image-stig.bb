@@ -15,6 +15,8 @@ IMAGE_INSTALL += " netinterface \
     picocom \
     yavta \
     i2c-tools \
+    speedcontrol \
+    tcpcontrol \
 "
 
 CORE_OS = " \

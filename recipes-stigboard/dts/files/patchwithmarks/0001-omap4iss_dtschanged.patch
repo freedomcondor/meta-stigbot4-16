@@ -1,14 +1,14 @@
-From 84627011c0a251690bee26fa83e65fe4e6ee07ca Mon Sep 17 00:00:00 2001
+From 60b9b7bae7f30ef1c6736813064892ee13a3ca84 Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Thu, 7 Jun 2018 10:42:29 +0200
+Date: Tue, 29 May 2018 14:56:44 +0200
 Subject: [PATCH] omap4iss_dtschanged
 
 ---
- arch/arm/boot/dts/omap4.dtsi | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ arch/arm/boot/dts/omap4.dtsi | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm/boot/dts/omap4.dtsi b/arch/arm/boot/dts/omap4.dtsi
-index 475904894b86..a75bd6805fed 100644
+index 475904894b86..c8dcebc91340 100644
 --- a/arch/arm/boot/dts/omap4.dtsi
 +++ b/arch/arm/boot/dts/omap4.dtsi
 @@ -748,7 +748,7 @@
@@ -20,7 +20,7 @@ index 475904894b86..a75bd6805fed 100644
  			reg = <0x52000000 0x4>,
  			      <0x52000010 0x4>;
  			reg-names = "rev", "sysc";
-@@ -762,13 +762,36 @@
+@@ -762,13 +762,38 @@
  					<SYSC_IDLE_SMART>,
  					<SYSC_IDLE_SMART_WKUP>;
  			ti,sysc-delay-us = <2>;
@@ -49,7 +49,9 @@ index 475904894b86..a75bd6805fed 100644
 +						<0x11000 0x200>, // isp_isif 
 +						<0x11200 0x080>; // isp_ipipeif 
 +
-+				syscon = <&omap4_padconf_global>; 
++				harry = <0x123 0x321 0x456>;
++				//syscon = <&scm_conf 0x6c>;	// copy from isp
++				syscon = <&scm_conf>; 
 +				status = "ok";
 +				ti,hwmods = "iss";
 +				interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;

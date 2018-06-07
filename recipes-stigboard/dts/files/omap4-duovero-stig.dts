@@ -121,6 +121,7 @@
 		unused1@7  { reg = <7>; };
 		unused2@11 { reg = <11>; };
 		unused3@15 { reg = <15>; };
+
 	};
 
 	pca9632_2: pca9632@11 {
@@ -438,8 +439,8 @@
 
 				port {
 					ov5640_11: endpoint {
-						clock-lanes = <0>;
-						data-lanes = <1>;
+						clock-lanes = <1>;
+						data-lanes = <2>;
 						remote-endpoint = <&csi_endpoint>;
 					};
 				};
@@ -469,23 +470,11 @@
 		port@0 {
 			csi_endpoint: endpoint@0 {
 				channel = "0";
-				clock-lanes = <0>;
-				data-lanes = <1>;
+				clock-lanes = <1>;
+				data-lanes = <2>;
 				remote-endpoint = <&ov5640_11>;
 			};
 		};
 	};
-	/*
-	csi21: csi2 {
-		port {
-			csi_endpoint: endpoint {
-				channel = "0";
-				clock-lanes = <0>;
-				data-lanes = <1>;
-				remote-endpoint = <&ov5640_11>;
-			};
-		};
-	};
-	*/
 };
 

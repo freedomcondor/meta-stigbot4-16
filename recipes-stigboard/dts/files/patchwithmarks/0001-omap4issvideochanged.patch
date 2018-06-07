@@ -1,0 +1,125 @@
+From c667133d225e6b47d380b8eb301a49689f97896d Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Wed, 16 May 2018 20:52:41 +0200
+Subject: [PATCH] omap4issvideochanged
+
+---
+ drivers/staging/media/omap4iss/iss_video.c | 36 +++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/staging/media/omap4iss/iss_video.c b/drivers/staging/media/omap4iss/iss_video.c
+index a3a83424a926..dd97eaa9aab5 100644
+--- a/drivers/staging/media/omap4iss/iss_video.c
++++ b/drivers/staging/media/omap4iss/iss_video.c
+@@ -875,6 +875,8 @@ iss_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
+ 
+ 	mutex_lock(&video->stream_lock);
+ 
++											pr_err("Harry said: iss_video_streamon started");
++
+ 	/*
+ 	 * Start streaming on the pipeline. No link touching an entity in the
+ 	 * pipeline can be activated or deactivated once streaming is started.
+@@ -885,29 +887,48 @@ iss_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
+ 	pipe->external_rate = 0;
+ 	pipe->external_bpp = 0;
+ 
++											pr_err("iss_video_streamon, before entity enum init");
++
+ 	ret = media_entity_enum_init(&pipe->ent_enum, entity->graph_obj.mdev);
+ 	if (ret)
+ 		goto err_graph_walk_init;
+ 
++											pr_err("iss_video_streamon, before graph walk init");
++
+ 	ret = media_graph_walk_init(&graph, entity->graph_obj.mdev);
+ 	if (ret)
+ 		goto err_graph_walk_init;
+ 
+-	if (video->iss->pdata->set_constraints)
++											pr_err("iss_video_streamon, before set constraints");
++
++	//if (video->iss->pdata->set_constraints)
++	if ((video->iss->pdata) && (video->iss->pdata->set_constraints))
+ 		video->iss->pdata->set_constraints(video->iss, true);
+ 
++											pr_err("iss_video_streamon, before pipeline start");
++
+ 	ret = media_pipeline_start(entity, &pipe->pipe);
+ 	if (ret < 0)
+ 		goto err_media_pipeline_start;
+ 
++											pr_err("iss_video_streamon, before walk start");
++
+ 	media_graph_walk_start(&graph, entity);
++
++											pr_err("iss_video_streamon, before while");
++
+ 	while ((entity = media_graph_walk_next(&graph)))
+ 		media_entity_enum_set(&pipe->ent_enum, entity);
+ 
++											pr_err("iss_video_streamon, before walk start");
++
+ 	/*
+ 	 * Verify that the currently configured format matches the output of
+ 	 * the connected subdev.
+ 	 */
++
++											pr_err("iss_video_streamon, before check format");
++
+ 	ret = iss_video_check_format(video, vfh);
+ 	if (ret < 0)
+ 		goto err_iss_video_check_format;
+@@ -919,8 +940,12 @@ iss_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
+ 	 * Find the ISS video node connected at the far end of the pipeline and
+ 	 * update the pipeline.
+ 	 */
++											pr_err("iss_video_streamon, before far end");
++
+ 	far_end = iss_video_far_end(video);
+ 
++											pr_err("iss_video_streamon, if buf.. capture");
++
+ 	if (video->type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
+ 		state = ISS_PIPELINE_STREAM_OUTPUT | ISS_PIPELINE_IDLE_OUTPUT;
+ 		pipe->input = far_end;
+@@ -958,6 +983,8 @@ iss_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
+ 	if (ret < 0)
+ 		goto err_iss_video_check_format;
+ 
++											pr_err("iss_video_streamon, after err video check format");
++
+ 	/*
+ 	 * In sensor-to-memory mode, the stream can be started synchronously
+ 	 * to the stream on command. In memory-to-memory mode, it will be
+@@ -976,6 +1003,7 @@ iss_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
+ 		spin_unlock_irqrestore(&video->qlock, flags);
+ 	}
+ 
++											pr_err("iss_video_streamon, after err before cleanup");
+ 	media_graph_walk_cleanup(&graph);
+ 
+ 	mutex_unlock(&video->stream_lock);
+@@ -987,7 +1015,8 @@ iss_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
+ err_iss_video_check_format:
+ 	media_pipeline_stop(&video->video.entity);
+ err_media_pipeline_start:
+-	if (video->iss->pdata->set_constraints)
++	//if (video->iss->pdata->set_constraints)
++	if ((video->iss->pdata) && (video->iss->pdata->set_constraints))
+ 		video->iss->pdata->set_constraints(video->iss, false);
+ 	video->queue = NULL;
+ 
+@@ -1037,7 +1066,8 @@ iss_video_streamoff(struct file *file, void *fh, enum v4l2_buf_type type)
+ 
+ 	media_entity_enum_cleanup(&pipe->ent_enum);
+ 
+-	if (video->iss->pdata->set_constraints)
++	//if (video->iss->pdata->set_constraints)
++	if ((video->iss->pdata) && (video->iss->pdata->set_constraints))
+ 		video->iss->pdata->set_constraints(video->iss, false);
+ 	media_pipeline_stop(&video->video.entity);
+ 
+-- 
+2.14.1
+

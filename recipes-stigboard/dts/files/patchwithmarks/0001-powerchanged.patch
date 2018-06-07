@@ -1,0 +1,104 @@
+From 97d686600aedea3e53f8877be37a972b63e49e25 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Mon, 21 May 2018 15:32:34 +0200
+Subject: [PATCH] powerchanged
+
+---
+ drivers/base/power/runtime.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime.c
+index 8bef3cb2424d..5dfde15eb1ab 100644
+--- a/drivers/base/power/runtime.c
++++ b/drivers/base/power/runtime.c
+@@ -679,6 +679,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 	struct device *parent = NULL;
+ 	int retval = 0;
+ 
++												pr_err("__rpm_resume");
+ 	trace_rpm_resume_rcuidle(dev, rpmflags);
+ 
+  repeat:
+@@ -692,6 +693,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 	if (retval)
+ 		goto out;
+ 
++												pr_err("__rpm_resume A");
+ 	/*
+ 	 * Other scheduled or pending requests need to be canceled.  Small
+ 	 * optimization: If an autosuspend timer is running, leave it running
+@@ -707,6 +709,8 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 		goto out;
+ 	}
+ 
++												pr_err("__rpm_resume B");
++
+ 	if (dev->power.runtime_status == RPM_RESUMING
+ 	    || dev->power.runtime_status == RPM_SUSPENDING) {
+ 		DEFINE_WAIT(wait);
+@@ -746,6 +750,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 		goto repeat;
+ 	}
+ 
++												pr_err("__rpm_resume C");
+ 	/*
+ 	 * See if we can skip waking up the parent.  This is safe only if
+ 	 * power.no_callbacks is set, because otherwise we don't know whether
+@@ -764,6 +769,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 		spin_unlock(&dev->parent->power.lock);
+ 	}
+ 
++												pr_err("__rpm_resume D");
+ 	/* Carry out an asynchronous or a synchronous resume. */
+ 	if (rpmflags & RPM_ASYNC) {
+ 		dev->power.request = RPM_REQ_RESUME;
+@@ -775,6 +781,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 		goto out;
+ 	}
+ 
++												pr_err("__rpm_resume E");
+ 	if (!parent && dev->parent) {
+ 		/*
+ 		 * Increment the parent's usage counter and resume it if
+@@ -806,6 +813,7 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 			goto out;
+ 		goto repeat;
+ 	}
++												pr_err("__rpm_resume F");
+  skip_parent:
+ 
+ 	if (dev->power.no_callbacks)
+@@ -813,10 +821,12 @@ static int rpm_resume(struct device *dev, int rpmflags)
+ 
+ 	__update_runtime_status(dev, RPM_RESUMING);
+ 
++												pr_err("__rpm_resume G call back");
+ 	callback = RPM_GET_CALLBACK(dev, runtime_resume);
+ 
+ 	dev_pm_disable_wake_irq_check(dev);
+ 	retval = rpm_callback(callback, dev);
++												pr_err("__rpm_resume after call back");
+ 	if (retval) {
+ 		__update_runtime_status(dev, RPM_SUSPENDED);
+ 		pm_runtime_cancel_pending(dev);
+@@ -1030,6 +1040,7 @@ int __pm_runtime_resume(struct device *dev, int rpmflags)
+ 	unsigned long flags;
+ 	int retval;
+ 
++												pr_err("__pm_runtime_resume");
+ 	might_sleep_if(!(rpmflags & RPM_ASYNC) && !dev->power.irq_safe &&
+ 			dev->power.runtime_status != RPM_ACTIVE);
+ 
+@@ -1037,7 +1048,9 @@ int __pm_runtime_resume(struct device *dev, int rpmflags)
+ 		atomic_inc(&dev->power.usage_count);
+ 
+ 	spin_lock_irqsave(&dev->power.lock, flags);
++												pr_err("__pm_runtime_resume, before rpm");
+ 	retval = rpm_resume(dev, rpmflags);
++												pr_err("__pm_runtime_resume, after rpm, ret = %d",retval);
+ 	spin_unlock_irqrestore(&dev->power.lock, flags);
+ 
+ 	return retval;
+-- 
+2.14.1
+

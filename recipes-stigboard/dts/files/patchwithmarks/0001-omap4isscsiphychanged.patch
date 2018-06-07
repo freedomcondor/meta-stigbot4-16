@@ -1,0 +1,149 @@
+From b2b9c8c0bcc55efb725fc099ad6720c43dac62cb Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Thu, 17 May 2018 16:52:26 +0200
+Subject: [PATCH] omap4isscsiphychanged
+
+---
+ drivers/staging/media/omap4iss/iss_csiphy.c | 52 ++++++++++++++++++++++++++---
+ 1 file changed, 48 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/staging/media/omap4iss/iss_csiphy.c b/drivers/staging/media/omap4iss/iss_csiphy.c
+index 748607f8918f..ed45eb4c8f83 100644
+--- a/drivers/staging/media/omap4iss/iss_csiphy.c
++++ b/drivers/staging/media/omap4iss/iss_csiphy.c
+@@ -121,7 +121,9 @@ int omap4iss_csiphy_config(struct iss_device *iss,
+ {
+ 	struct iss_csi2_device *csi2 = v4l2_get_subdevdata(csi2_subdev);
+ 	struct iss_pipeline *pipe = to_iss_pipeline(&csi2_subdev->entity);
+-	struct iss_v4l2_subdevs_group *subdevs = pipe->external->host_priv;
++	//struct iss_v4l2_subdevs_group *subdevs = pipe->external->host_priv;
++	struct iss_bus_cfg *buscfg = pipe->external->host_priv;
++
+ 	struct iss_csiphy_dphy_cfg csi2phy;
+ 	int csi2_ddrclk_khz;
+ 	struct iss_csiphy_lanes_cfg *lanes;
+@@ -129,8 +131,17 @@ int omap4iss_csiphy_config(struct iss_device *iss,
+ 	u32 cam_rx_ctrl;
+ 	unsigned int i;
+ 
+-	lanes = &subdevs->bus.csi2.lanecfg;
++	if (!buscfg) {
++		struct iss_async_subdev *isd =
++			container_of(pipe->external->asd, 
++					struct iss_async_subdev, asd);
++		buscfg = &isd->bus;
++	}
++
++	lanes = &buscfg->bus.csi2.lanecfg;
++	//lanes = &subdevs->bus.csi2.lanecfg;
+ 
++										pr_err("csiphy_config begin");
+ 	/*
+ 	 * SCM.CONTROL_CAMERA_RX
+ 	 * - bit [31] : CSIPHY2 lane 2 enable (4460+ only)
+@@ -145,20 +156,35 @@ int omap4iss_csiphy_config(struct iss_device *iss,
+ 	 * TODO: When implementing DT support specify the CONTROL_CAMERA_RX
+ 	 * register offset in the syscon property instead of hardcoding it.
+ 	 */
++
++										pr_err("csiphy_config before syscon");
++
+ 	regmap_read(iss->syscon, 0x68, &cam_rx_ctrl);
+ 
+-	if (subdevs->interface == ISS_INTERFACE_CSI2A_PHY1) {
++										pr_err("csiphy_config after syscon");
++										pr_err("csiphy_config cam_rx_ctrl = %d",cam_rx_ctrl);
++
++	//if (subdevs->interface == ISS_INTERFACE_CSI2A_PHY1) {
++	if (buscfg->interface == ISS_INTERFACE_CSI2A_PHY1) {
++										pr_err("csiphy_config inside if");
+ 		cam_rx_ctrl &= ~(OMAP4_CAMERARX_CSI21_LANEENABLE_MASK |
+ 				OMAP4_CAMERARX_CSI21_CAMMODE_MASK);
+ 		/* NOTE: Leave CSIPHY1 config to 0x0: D-PHY mode */
+ 		/* Enable all lanes for now */
++
++										pr_err("csiphy_config inside if A");
++
+ 		cam_rx_ctrl |=
+ 			0x1f << OMAP4_CAMERARX_CSI21_LANEENABLE_SHIFT;
+ 		/* Enable CTRLCLK */
++										pr_err("csiphy_config inside if B");
+ 		cam_rx_ctrl |= OMAP4_CAMERARX_CSI21_CTRLCLKEN_MASK;
++										pr_err("csiphy_config inside if C");
+ 	}
++										pr_err("csiphy_config A");
+ 
+-	if (subdevs->interface == ISS_INTERFACE_CSI2B_PHY2) {
++	if (buscfg->interface == ISS_INTERFACE_CSI2B_PHY2) {
++	//if (subdevs->interface == ISS_INTERFACE_CSI2B_PHY2) {
+ 		cam_rx_ctrl &= ~(OMAP4_CAMERARX_CSI22_LANEENABLE_MASK |
+ 				OMAP4_CAMERARX_CSI22_CAMMODE_MASK);
+ 		/* NOTE: Leave CSIPHY2 config to 0x0: D-PHY mode */
+@@ -168,39 +194,55 @@ int omap4iss_csiphy_config(struct iss_device *iss,
+ 		/* Enable CTRLCLK */
+ 		cam_rx_ctrl |= OMAP4_CAMERARX_CSI22_CTRLCLKEN_MASK;
+ 	}
++										pr_err("csiphy_config B");
+ 
+ 	regmap_write(iss->syscon, 0x68, cam_rx_ctrl);
++										pr_err("csiphy_config after regmap");
+ 
+ 	/* Reset used lane count */
+ 	csi2->phy->used_data_lanes = 0;
+ 
+ 	/* Clock and data lanes verification */
+ 	for (i = 0; i < csi2->phy->max_data_lanes; i++) {
++										pr_err("csiphy_config verifi for");
+ 		if (lanes->data[i].pos == 0)
+ 			continue;
+ 
++										pr_err("csiphy_config verifi A");
++
+ 		if (lanes->data[i].pol > 1 ||
+ 		    lanes->data[i].pos > (csi2->phy->max_data_lanes + 1))
+ 			return -EINVAL;
+ 
++										pr_err("csiphy_config verifi B");
++
+ 		if (used_lanes & (1 << lanes->data[i].pos))
+ 			return -EINVAL;
+ 
++										pr_err("csiphy_config verifi C");
++
+ 		used_lanes |= 1 << lanes->data[i].pos;
+ 		csi2->phy->used_data_lanes++;
++										pr_err("csiphy_config verifi D");
+ 	}
+ 
++										pr_err("csiphy_config verifi clk");
+ 	if (lanes->clk.pol > 1 ||
+ 	    lanes->clk.pos > (csi2->phy->max_data_lanes + 1))
+ 		return -EINVAL;
++										pr_err("csiphy_config verifi before clk pos");
++										pr_err("csiphy_config clk pos = %d",lanes->clk.pos);
++										pr_err("csiphy_config clk usedlanes = 0x%x",used_lanes);
+ 
+ 	if (lanes->clk.pos == 0 || used_lanes & (1 << lanes->clk.pos))
+ 		return -EINVAL;
++										pr_err("csiphy_config verifi after clk");
+ 
+ 	csi2_ddrclk_khz = pipe->external_rate / 1000
+ 		/ (2 * csi2->phy->used_data_lanes)
+ 		* pipe->external_bpp;
+ 
++										pr_err("csiphy_config somewhere");
+ 	/*
+ 	 * THS_TERM: Programmed value = ceil(12.5 ns/DDRClk period) - 1.
+ 	 * THS_SETTLE: Programmed value = ceil(90 ns/DDRClk period) + 3.
+@@ -216,6 +258,8 @@ int omap4iss_csiphy_config(struct iss_device *iss,
+ 	csi2->phy->lanes = *lanes;
+ 	mutex_unlock(&csi2->phy->mutex);
+ 
++										pr_err("csiphy_config end");
++
+ 	return 0;
+ }
+ 
+-- 
+2.14.1
+

@@ -20,10 +20,11 @@ SRC_URI = " \
     file://0001-spidev-Add-spidev-compatible-id.patch \
     file://0002-mwifiex-Skip-unsupported-CHAN_REGION_CFG-cmd.patch \
     file://0003-mwifiex-Remove-unsupported-GTK_REKEY_OFFLOAD_CFG-cmd.patch \
-    file://0004-media-Use-GPIO-controls-in-OV5640.patch \
+    file://clk-ti-fix-flag-space-conflict-with-clkctrl-clocks.patch \
+    file://reset-ti-rstctrl-use-the-reset-simple-driver.patch \
     file://defconfig \
 "    
-
+#    file://0004-media-Use-GPIO-controls-in-OV5640.patch 
 #    file://0005-serdev-Support-multi-uart-controllers.patch 
 #    file://0006-mfd-Add-support-for-the-BuilderBot-AVRs.patch 
 #    file://0001-Debugging.patch 

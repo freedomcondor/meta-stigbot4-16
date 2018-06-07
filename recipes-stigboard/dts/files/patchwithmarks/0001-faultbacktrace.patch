@@ -1,0 +1,25 @@
+From 6ae112c6a960ee6922c4e3413de2c50ee16c755c Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Wed, 16 May 2018 10:24:33 +0200
+Subject: [PATCH] faultbacktrace
+
+---
+ arch/arm/mm/fault.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/mm/fault.c b/arch/arm/mm/fault.c
+index b75eada23d0a..9b24efbe3b4e 100644
+--- a/arch/arm/mm/fault.c
++++ b/arch/arm/mm/fault.c
+@@ -146,6 +146,8 @@ __do_kernel_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr,
+ 		 (addr < PAGE_SIZE) ? "NULL pointer dereference" :
+ 		 "paging request", addr);
+ 
++	dump_stack();
++
+ 	show_pte(mm, addr);
+ 	die("Oops", regs, fsr);
+ 	bust_spinlocks(0);
+-- 
+2.14.1
+
