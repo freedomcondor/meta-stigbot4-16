@@ -1,6 +1,6 @@
-From 2b73432b3d2f1b7fe446a1bd460d020036ef3470 Mon Sep 17 00:00:00 2001
+From 7491b30e9db2887a3db81bc1b3047b76db39a4f2 Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Thu, 7 Jun 2018 11:09:46 +0200
+Date: Wed, 13 Jun 2018 10:08:02 +0200
 Subject: [PATCH] ov5640driverchanged
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH] ov5640driverchanged
  1 file changed, 61 insertions(+), 63 deletions(-)
 
 diff --git a/drivers/media/i2c/ov5640.c b/drivers/media/i2c/ov5640.c
-index e2dd352224c7..a6163bb17ff3 100644
+index e2dd352224c7..826c4734e421 100644
 --- a/drivers/media/i2c/ov5640.c
 +++ b/drivers/media/i2c/ov5640.c
 @@ -8,9 +8,6 @@
@@ -171,7 +171,7 @@ index e2dd352224c7..a6163bb17ff3 100644
 +	case V4L2_CID_PIXEL_RATE:
 +		if (!ctrl->val)
 +			return 0;
-+		val = ov5640_get_sysclk(sensor);
++		val = ov5640_get_sysclk(sensor) * 10000;
 +		if (val < 0)
 +			return val;
 +		sensor->ctrls.pixel_rate->val = val;
@@ -188,7 +188,7 @@ index e2dd352224c7..a6163bb17ff3 100644
 +	if (ret)
 +		return ret;
 +	ctrls->pixel_rate = v4l2_ctrl_new_std(hdl, ops, V4L2_CID_PIXEL_RATE,
-+				       0, INT_MAX, 1, ov5640_get_sysclk(sensor));
++				       0, INT_MAX, 1, ov5640_get_sysclk(sensor) * 10000);
 +	ov5640_set_power_off(sensor);
 +						
  	if (hdl->error) {

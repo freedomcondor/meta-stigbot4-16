@@ -83,13 +83,13 @@
 	/*********** csi2 pins *********************************/
 	iss_csi21_pins: pinmux_iss_csi21_pins {
 		pinctrl-single,pins = <
-			OMAP4_IOPAD(0x0a0, PIN_INPUT | MUX_MODE0)		/* csi21_dx0.csi21_dx0 */
-			OMAP4_IOPAD(0x0a2, PIN_INPUT | MUX_MODE0)		/* csi21_dy0.csi21_dy0 */
-			OMAP4_IOPAD(0x0a4, PIN_INPUT | MUX_MODE0)		/* csi21_dx1.csi21_dx1 */
-			OMAP4_IOPAD(0x0a6, PIN_INPUT | MUX_MODE0)		/* csi21_dy1.csi21_dy1 */
-			OMAP4_IOPAD(0x0a8, PIN_INPUT | MUX_MODE0)		/* csi21_dx2.csi21_dx2 */
-			OMAP4_IOPAD(0x0aa, PIN_INPUT | MUX_MODE0)		/* csi21_dy2.csi21_dy2 */
+			OMAP4_IOPAD(0x0a0, PIN_INPUT_PULLDOWN | MUX_MODE0)		/* csi21_dx0.csi21_dx0 */
+			OMAP4_IOPAD(0x0a2, PIN_INPUT_PULLDOWN | MUX_MODE0)		/* csi21_dy0.csi21_dy0 */
+			OMAP4_IOPAD(0x0a4, PIN_INPUT_PULLDOWN | MUX_MODE0)		/* csi21_dx1.csi21_dx1 */
+			OMAP4_IOPAD(0x0a6, PIN_INPUT_PULLDOWN | MUX_MODE0)		/* csi21_dy1.csi21_dy1 */
 		>;
+			//OMAP4_IOPAD(0x0a8, PIN_INPUT | MUX_MODE0)		/* csi21_dx2.csi21_dx2 */
+			//OMAP4_IOPAD(0x0aa, PIN_INPUT | MUX_MODE0)		/* csi21_dy2.csi21_dy2 */
 	};
 };
 
@@ -441,6 +441,7 @@
 					ov5640_11: endpoint {
 						clock-lanes = <1>;
 						data-lanes = <2>;
+
 						remote-endpoint = <&csi_endpoint>;
 					};
 				};

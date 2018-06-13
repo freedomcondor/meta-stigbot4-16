@@ -17,6 +17,8 @@ IMAGE_INSTALL += " netinterface \
     i2c-tools \
     speedcontrol \
     tcpcontrol \
+    ldd \
+    strace \
 "
 
 CORE_OS = " \
