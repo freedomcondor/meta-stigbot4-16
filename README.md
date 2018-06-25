@@ -1,3 +1,13 @@
+Weixu ZHU (Harry)
+	zhuweixu_harry@126.com
+-------------------------------------------------------------------------------------------
+current state:
+	nearly all the robot sensors are functional except the camera.
+	the camera can send data in 2 lane mode, and omap4iss can successfully receive
+	images from 1 lane. So we can have some blur pictures.
+	if we switch the camera into 1 lane mode, an L3 error would occur, still working on that
+-------------------------------------------------------------------------------------------
+
 This layer depends on:
 
     URI: git://git.yoctoproject.org/poky.git
@@ -23,9 +33,14 @@ Instructions for using this layer can be found at [jumpnowtek.com][duovero-yocto
 
 
 -----------------------------------------------------------------------------------------
-in this layer, folder recipe-stigboard and recipe-robot are added on the bases of meta-duovero
-recipe-stigboard contains drivers related to the board, like device tree, drivers, etc.
-recipe-robot contains softwares, like argos, lua, speed controls
+what has been changed based on meta-duovero:
+	recipe-stigboard
+	recipe-robot
+		recipe-stigboard contains drivers related to the board, like device tree, drivers, etc.
+		recipe-robot contains softwares, like argos, lua, speed controls
+	
+	recipes-connectivity/wpa-supplicant/files/wap_supplicant.conf-sane
+		wifi support, the wifi ssid and password is defined here
 
 --------------------------------------------------------------------------------------------
 
@@ -58,6 +73,8 @@ The tutorial in that link is not using a standard folder structure. To make it s
 6. bitbake console-image-stig
 
 7. copy image:
+
+	(you may need to create a /media/card folder for the first time)
 
 	goto meta-stig/scripts
 	

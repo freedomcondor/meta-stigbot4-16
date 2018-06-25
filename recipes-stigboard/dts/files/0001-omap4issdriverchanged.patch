@@ -1,14 +1,18 @@
-From 30436f899b6d86d2014ce5ee5439a70191102a1c Mon Sep 17 00:00:00 2001
+From 9bc134bc1cc831ef2b46570cde4ac1407a2c3231 Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Thu, 7 Jun 2018 12:04:33 +0200
+Date: Mon, 25 Jun 2018 11:28:09 +0200
 Subject: [PATCH] omap4issdriverchanged
 
 ---
- drivers/staging/media/omap4iss/iss.c        | 321 ++++++++++++++++++----------
- drivers/staging/media/omap4iss/iss.h        |  15 ++
- drivers/staging/media/omap4iss/iss_csiphy.c |  15 +-
- drivers/staging/media/omap4iss/iss_video.c  |   6 +-
- 4 files changed, 241 insertions(+), 116 deletions(-)
+ drivers/staging/media/omap4iss/iss.c         | 321 ++++++++++++++++++---------
+ drivers/staging/media/omap4iss/iss.h         |  15 ++
+ drivers/staging/media/omap4iss/iss_csi2.c    |   1 +
+ drivers/staging/media/omap4iss/iss_csiphy.c  |  15 +-
+ drivers/staging/media/omap4iss/iss_ipipe.c   |   1 +
+ drivers/staging/media/omap4iss/iss_ipipeif.c |   1 +
+ drivers/staging/media/omap4iss/iss_resizer.c |   1 +
+ drivers/staging/media/omap4iss/iss_video.c   |   6 +-
+ 8 files changed, 245 insertions(+), 116 deletions(-)
 
 diff --git a/drivers/staging/media/omap4iss/iss.c b/drivers/staging/media/omap4iss/iss.c
 index b1036baebb03..6272544d8529 100644
@@ -527,6 +531,18 @@ index 760ee27da704..b58a52748596 100644
  #define v4l2_dev_to_iss_device(dev) \
  	container_of(dev, struct iss_device, v4l2_dev)
  
+diff --git a/drivers/staging/media/omap4iss/iss_csi2.c b/drivers/staging/media/omap4iss/iss_csi2.c
+index f6acc541e8a2..d6487d7fe784 100644
+--- a/drivers/staging/media/omap4iss/iss_csi2.c
++++ b/drivers/staging/media/omap4iss/iss_csi2.c
+@@ -1275,6 +1275,7 @@ static int csi2_init_entities(struct iss_csi2_device *csi2, const char *subname)
+ 	pads[CSI2_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE;
+ 	pads[CSI2_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
+ 
++	me->function = MEDIA_ENT_F_IO_V4L;
+ 	me->ops = &csi2_media_ops;
+ 	ret = media_entity_pads_init(me, CSI2_PADS_NUM, pads);
+ 	if (ret < 0)
 diff --git a/drivers/staging/media/omap4iss/iss_csiphy.c b/drivers/staging/media/omap4iss/iss_csiphy.c
 index 748607f8918f..a8cf24ebc2e8 100644
 --- a/drivers/staging/media/omap4iss/iss_csiphy.c
@@ -574,6 +590,42 @@ index 748607f8918f..a8cf24ebc2e8 100644
  		cam_rx_ctrl &= ~(OMAP4_CAMERARX_CSI22_LANEENABLE_MASK |
  				OMAP4_CAMERARX_CSI22_CAMMODE_MASK);
  		/* NOTE: Leave CSIPHY2 config to 0x0: D-PHY mode */
+diff --git a/drivers/staging/media/omap4iss/iss_ipipe.c b/drivers/staging/media/omap4iss/iss_ipipe.c
+index d86ef8a031f2..39cf6571aafe 100644
+--- a/drivers/staging/media/omap4iss/iss_ipipe.c
++++ b/drivers/staging/media/omap4iss/iss_ipipe.c
+@@ -515,6 +515,7 @@ static int ipipe_init_entities(struct iss_ipipe_device *ipipe)
+ 	pads[IPIPE_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
+ 	pads[IPIPE_PAD_SOURCE_VP].flags = MEDIA_PAD_FL_SOURCE;
+ 
++	me->function = MEDIA_ENT_F_VID_IF_BRIDGE;
+ 	me->ops = &ipipe_media_ops;
+ 	ret = media_entity_pads_init(me, IPIPE_PADS_NUM, pads);
+ 	if (ret < 0)
+diff --git a/drivers/staging/media/omap4iss/iss_ipipeif.c b/drivers/staging/media/omap4iss/iss_ipipeif.c
+index cb88b2bd0d82..d5b798e631d2 100644
+--- a/drivers/staging/media/omap4iss/iss_ipipeif.c
++++ b/drivers/staging/media/omap4iss/iss_ipipeif.c
+@@ -747,6 +747,7 @@ static int ipipeif_init_entities(struct iss_ipipeif_device *ipipeif)
+ 	pads[IPIPEIF_PAD_SOURCE_ISIF_SF].flags = MEDIA_PAD_FL_SOURCE;
+ 	pads[IPIPEIF_PAD_SOURCE_VP].flags = MEDIA_PAD_FL_SOURCE;
+ 
++	me->function = MEDIA_ENT_F_VID_IF_BRIDGE;
+ 	me->ops = &ipipeif_media_ops;
+ 	ret = media_entity_pads_init(me, IPIPEIF_PADS_NUM, pads);
+ 	if (ret < 0)
+diff --git a/drivers/staging/media/omap4iss/iss_resizer.c b/drivers/staging/media/omap4iss/iss_resizer.c
+index 4bbfa20b3c38..afd147bd73ff 100644
+--- a/drivers/staging/media/omap4iss/iss_resizer.c
++++ b/drivers/staging/media/omap4iss/iss_resizer.c
+@@ -789,6 +789,7 @@ static int resizer_init_entities(struct iss_resizer_device *resizer)
+ 	pads[RESIZER_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
+ 	pads[RESIZER_PAD_SOURCE_MEM].flags = MEDIA_PAD_FL_SOURCE;
+ 
++	me->function = MEDIA_ENT_F_PROC_VIDEO_SCALER;
+ 	me->ops = &resizer_media_ops;
+ 	ret = media_entity_pads_init(me, RESIZER_PADS_NUM, pads);
+ 	if (ret < 0)
 diff --git a/drivers/staging/media/omap4iss/iss_video.c b/drivers/staging/media/omap4iss/iss_video.c
 index a3a83424a926..9dc92d8dd994 100644
 --- a/drivers/staging/media/omap4iss/iss_video.c
