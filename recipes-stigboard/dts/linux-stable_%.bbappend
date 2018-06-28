@@ -22,15 +22,13 @@ SRC_URI += "file://0001-vcnl-match.patch"
 SRC_URI += "file://v4l2_omap4iss.cfg"
 SRC_URI += "file://devmem.cfg"
 #	#create /dev/mem for rwmem debug
-SRC_URI += "file://0001-omap4includechanged.patch"
-SRC_URI += "file://0001-omap4issdriverchanged.patch"
-SRC_URI += "file://0001-omap4iss_dtschanged.patch"
+SRC_URI += "file://0001-omap4iss_driver_dtsi.patch"
 
 #6. camera
 SRC_URI += "file://pca953x.cfg"
 SRC_URI += "file://ov5640.cfg"
 #	#ov5640.cfg depends on v4l2, so it has to be after v4l2_omap4iss.cfg
-SRC_URI += "file://0001-ov5640driverchanged.patch"
+SRC_URI += "file://0001-ov5640driver.patch"
 
 # for device tree
 #	change device tree from omap4-duovero-parlor.dts to omap4-duovero-stig.dts

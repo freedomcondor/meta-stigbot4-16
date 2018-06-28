@@ -1,0 +1,61 @@
+From 5e1bcff5bf54b25a8825d202f53febe7a1673109 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Mon, 25 Jun 2018 15:32:06 +0200
+Subject: [PATCH] l3changed
+
+---
+ drivers/bus/omap_l3_noc.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/bus/omap_l3_noc.c b/drivers/bus/omap_l3_noc.c
+index b040447575ad..5081eeaa7a37 100644
+--- a/drivers/bus/omap_l3_noc.c
++++ b/drivers/bus/omap_l3_noc.c
+@@ -106,6 +106,12 @@ static int l3_handle_target(struct omap_l3 *l3, void __iomem *base,
+ 	case CUSTOM_ERROR:
+ 		err_description = "Custom";
+ 
++														pr_err("l3 custom get address\n");
++							snprintf(err_string, sizeof(err_string),
++										 ": At Address: 0x%08X ",
++										 readl_relaxed(l3_targ_slvofslsb));
++														pr_err("l3 custom after get address\n");
++
+ 		l3_targ_mstaddr = l3_targ_base +
+ 				  L3_TARG_STDERRLOG_CINFO_MSTADDR;
+ 		l3_targ_hdr = l3_targ_base + L3_TARG_STDERRLOG_CINFO_OPCODE;
+@@ -138,6 +144,7 @@ static int l3_handle_target(struct omap_l3 *l3, void __iomem *base,
+ 		 (m_req_info & BIT(1)) ? "Supervisor" : "User",
+ 		 (m_req_info & BIT(3)) ? "Debug" : "Functional");
+ 
++										pr_err("i am l3 before warn\n");
+ 	WARN(true,
+ 	     "%s:L3 %s Error: MASTER %s TARGET %s (%s)%s%s\n",
+ 	     dev_name(l3->dev),
+@@ -145,6 +152,7 @@ static int l3_handle_target(struct omap_l3 *l3, void __iomem *base,
+ 	     master_name, target_name,
+ 	     l3_transaction_type[op_code],
+ 	     err_string, info_string);
++										pr_err("i am l3 after warn\n");
+ 
+ 	/* clear the std error log*/
+ 	clear = std_err_main | CLEAR_STDERR_LOG;
+@@ -194,6 +202,7 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
+ 			/* Identify the source from control status register */
+ 			err_src = __ffs(err_reg);
+ 
++													pr_err("in l3_int_handler, err_src = %d\n",err_src);
+ 			ret = l3_handle_target(l3, base, flag_mux, err_src);
+ 
+ 			/*
+@@ -203,6 +212,7 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
+ 			 * reoccuring and locking up the system.
+ 			 */
+ 			if (ret) {
++													pr_err("in l3_int_handler, target ret = %d\n",ret);
+ 				dev_err(l3->dev,
+ 					"L3 %s error: target %d mod:%d %s\n",
+ 					inttype ? "debug" : "application",
+-- 
+2.14.1
+
