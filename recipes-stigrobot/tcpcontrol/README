@@ -1,1 +1,19 @@
-open a server, listen to commands from PC to change speed
+this is a little program that sets up a server on the robot, 
+letting you control the speed of the robot through tcp. 
+
+	layout like this:
+
+		PC(where a control console program is running)
+			|
+			|tcp
+			|
+		linux on robot (where this program is running)
+			|
+			|uart
+			|
+		dds on board
+
+in both tcp and uart, 4 bytes is transfered forward and received back to 
+set the speed and get the measure feedback
+
+-------------------------------------------------------

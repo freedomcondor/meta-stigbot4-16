@@ -1,37 +1,36 @@
-From 23c74d2e5641a0c94fdfaaac65a95f3bfa23adc5 Mon Sep 17 00:00:00 2001
+From fda7ee950c82460b16f0f0b9dba4d4d6b31e118e Mon Sep 17 00:00:00 2001
 From: Condor3397 <freedomcondor@126.com>
-Date: Thu, 28 Jun 2018 12:14:08 +0200
-Subject: [PATCH] omap4iss_driver_dtsi
+Date: Fri, 29 Jun 2018 14:35:48 +0200
+Subject: [PATCH] omap4iss-driver-dts
 
 ---
- arch/arm/boot/dts/omap4.dtsi                 |  31 ++-
- drivers/staging/media/omap4iss/iss.c         | 326 +++++++++++++++++----------
- drivers/staging/media/omap4iss/iss.h         |  21 +-
- drivers/staging/media/omap4iss/iss_csi2.c    |   1 +
- drivers/staging/media/omap4iss/iss_csiphy.c  |  15 +-
- drivers/staging/media/omap4iss/iss_csiphy.h  |   2 +-
- drivers/staging/media/omap4iss/iss_ipipe.c   |   1 +
- drivers/staging/media/omap4iss/iss_ipipeif.c |   1 +
- drivers/staging/media/omap4iss/iss_resizer.c |   1 +
- drivers/staging/media/omap4iss/iss_video.c   |   7 -
- drivers/staging/media/omap4iss/omap4iss.h    |  74 ++++++
- 11 files changed, 346 insertions(+), 134 deletions(-)
- create mode 100644 drivers/staging/media/omap4iss/omap4iss.h
+ arch/arm/boot/dts/omap4.dtsi                       |  28 +-
+ drivers/staging/media/omap4iss/iss.c               | 313 +++++++++++++--------
+ drivers/staging/media/omap4iss/iss.h               |  20 +-
+ drivers/staging/media/omap4iss/iss_csi2.c          |   1 +
+ drivers/staging/media/omap4iss/iss_csiphy.c        |  15 +-
+ drivers/staging/media/omap4iss/iss_csiphy.h        |   2 +-
+ drivers/staging/media/omap4iss/iss_ipipe.c         |   1 +
+ drivers/staging/media/omap4iss/iss_ipipeif.c       |   1 +
+ drivers/staging/media/omap4iss/iss_resizer.c       |   1 +
+ drivers/staging/media/omap4iss/iss_video.c         |   7 -
+ .../staging/media/omap4iss}/omap4iss.h             |  14 +-
+ 11 files changed, 266 insertions(+), 137 deletions(-)
+ rename {include/linux/platform_data/media => drivers/staging/media/omap4iss}/omap4iss.h (82%)
 
 diff --git a/arch/arm/boot/dts/omap4.dtsi b/arch/arm/boot/dts/omap4.dtsi
-index 475904894b86..a75bd6805fed 100644
+index 475904894b86..cb4605c45a60 100644
 --- a/arch/arm/boot/dts/omap4.dtsi
 +++ b/arch/arm/boot/dts/omap4.dtsi
-@@ -748,7 +748,7 @@
+@@ -748,7 +748,6 @@
  
  		target-module@52000000 {
  			compatible = "ti,sysc-omap4", "ti,sysc";
 -			ti,hwmods = "iss";
-+			//ti,hwmods = "iss";
  			reg = <0x52000000 0x4>,
  			      <0x52000010 0x4>;
  			reg-names = "rev", "sysc";
-@@ -762,13 +762,36 @@
+@@ -762,13 +761,34 @@
  					<SYSC_IDLE_SMART>,
  					<SYSC_IDLE_SMART_WKUP>;
  			ti,sysc-delay-us = <2>;
@@ -48,31 +47,29 @@ index 475904894b86..a75bd6805fed 100644
 -			/* No child device binding, driver in staging */
 +			iss: iss@0 {
 +				compatible = "ti,omap4iss";
-+				reg =  	<0x0000 0x200>,	// top 
-+						<0x1000 0x170>, // csi2_a_regs1 
-+						<0x1170 0x020>, // camerarx_core1 
-+						<0x1400 0x170>, // csi2_b_regs1 
-+						<0x1570 0x020>, // camerarx_core2 
-+						<0x2000 0x200>, // bte 
-+						<0x10000 0x0a0>, // isp_sys1 
-+						<0x10400 0x400>, // isp_resizer 
-+						<0x10800 0x800>, // isp_ipipe 
-+						<0x11000 0x200>, // isp_isif 
-+						<0x11200 0x080>; // isp_ipipeif 
++				reg = <0x0000 0x200>,	// top 
++				      <0x1000 0x170>, // csi2_a_regs1 
++				      <0x1170 0x020>, // camerarx_core1 
++				      <0x1400 0x170>, // csi2_b_regs1 
++				      <0x1570 0x020>, // camerarx_core2 
++				      <0x2000 0x200>, // bte 
++				      <0x10000 0x0a0>, // isp_sys1 
++				      <0x10400 0x400>, // isp_resizer 
++				      <0x10800 0x800>, // isp_ipipe 
++				      <0x11000 0x200>, // isp_isif 
++				      <0x11200 0x080>; // isp_ipipeif 
 +
 +				syscon = <&omap4_padconf_global>; 
-+				status = "ok";
-+				ti,hwmods = "iss";
 +				interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
 +
 +				dmas = <&sdma 9>, <&sdma 10>, <&sdma 12>, <&sdma 13>;
-+				dma-names = "1", "2", "3", "4";	// only 4 originally, 5 is a flag
++				dma-names = "1", "2", "3", "4";
 +			};
  		};
  
  		mmu_ipu: mmu@55082000 {
 diff --git a/drivers/staging/media/omap4iss/iss.c b/drivers/staging/media/omap4iss/iss.c
-index b1036baebb03..a4b52bd84b86 100644
+index b1036baebb03..b1de58b41875 100644
 --- a/drivers/staging/media/omap4iss/iss.c
 +++ b/drivers/staging/media/omap4iss/iss.c
 @@ -14,6 +14,7 @@
@@ -266,58 +263,50 @@ index b1036baebb03..a4b52bd84b86 100644
  done:
  	if (ret < 0)
  		iss_unregister_entities(iss);
-@@ -1200,6 +1110,159 @@ static int iss_initialize_modules(struct iss_device *iss)
+@@ -1200,6 +1110,151 @@ static int iss_initialize_modules(struct iss_device *iss)
  	return ret;
  }
  
-+static int iss_link_entity(
-+    struct iss_device *iss, struct media_entity *entity,
-+    enum iss_interface_type interface)
++static int iss_link_entity(struct iss_device *iss, 
++									struct media_entity *entity, 
++									enum iss_interface_type interface)
 +{
-+    struct media_entity *input;
-+    unsigned int flags;
-+    unsigned int pad;
-+    unsigned int i;
++	struct media_entity *input;
++	unsigned int flags;
++	unsigned int pad;
++	unsigned int i;
 +
-+    /* Connect the sensor to the correct interface module.
-+     * serial sensors are connected to the CSI2a or CSI2b
-+     */
-+    switch (interface) {
++	switch (interface) {
++		case ISS_INTERFACE_CSI2A_PHY1:
++			input = &iss->csi2a.subdev.entity;
++			pad = CSI2_PAD_SINK;
++			flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED;
++			break;
++		case ISS_INTERFACE_CSI2B_PHY2:
++			input = &iss->csi2b.subdev.entity;
++			pad = CSI2_PAD_SINK;
++			flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED;
++			break;
++		default:
++			dev_err(iss->dev, "%s: invalid interface type %u\n", __func__, interface);
++			return -EINVAL;
++	}
 +
-+    case ISS_INTERFACE_CSI2A_PHY1:
-+        input = &iss->csi2a.subdev.entity;
-+        pad = CSI2_PAD_SINK;
-+        flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED;
-+        break;
++	for (i = 0; i < entity->num_pads; i++) {
++		if (entity->pads[i].flags & MEDIA_PAD_FL_SOURCE)
++			break;
++	}
++	if (i == entity->num_pads) {
++		dev_err(iss->dev, "%s: no source pad in external entity\n", __func__);
++		return -EINVAL;
++	}
 +
-+    case ISS_INTERFACE_CSI2B_PHY2:
-+        input = &iss->csi2b.subdev.entity;
-+        pad = CSI2_PAD_SINK;
-+        flags = MEDIA_LNK_FL_IMMUTABLE | MEDIA_LNK_FL_ENABLED;
-+        break;
-+
-+    default:
-+        dev_err(iss->dev, "%s: invalid interface type %u\n", __func__,
-+            interface);
-+        return -EINVAL;
-+    }
-+
-+    for (i = 0; i < entity->num_pads; i++) {
-+        if (entity->pads[i].flags & MEDIA_PAD_FL_SOURCE)
-+            break;
-+    }
-+    if (i == entity->num_pads) {
-+        dev_err(iss->dev, "%s: no source pad in external entity\n",
-+            __func__);
-+        return -EINVAL;
-+    }
-+
-+    return media_create_pad_link(entity, i, input, pad, flags);
++	return media_create_pad_link(entity, i, input, pad, flags);
 +}
 +
 +static int iss_fwnode_parse(struct device *dev,
-+							struct v4l2_fwnode_endpoint *vep,
-+							struct v4l2_async_subdev *asd)
++									struct v4l2_fwnode_endpoint *vep,
++									struct v4l2_async_subdev *asd)
 +{
 +	struct iss_async_subdev *isd =
 +			container_of(asd, struct iss_async_subdev, asd);
@@ -426,7 +415,7 @@ index b1036baebb03..a4b52bd84b86 100644
  static int iss_probe(struct platform_device *pdev)
  {
  	struct iss_platform_data *pdata = pdev->dev.platform_data;
-@@ -1207,9 +1270,6 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1207,9 +1262,6 @@ static int iss_probe(struct platform_device *pdev)
  	unsigned int i;
  	int ret;
  
@@ -436,7 +425,7 @@ index b1036baebb03..a4b52bd84b86 100644
  	iss = devm_kzalloc(&pdev->dev, sizeof(*iss), GFP_KERNEL);
  	if (!iss)
  		return -ENOMEM;
-@@ -1217,19 +1277,26 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1217,19 +1269,23 @@ static int iss_probe(struct platform_device *pdev)
  	mutex_init(&iss->iss_mutex);
  
  	iss->dev = &pdev->dev;
@@ -456,20 +445,17 @@ index b1036baebb03..a4b52bd84b86 100644
 -	iss->syscon = syscon_regmap_lookup_by_compatible("syscon");
 +	pm_qos_add_request(&iss->pm_qos, PM_QOS_CPU_DMA_LATENCY, PM_QOS_DEFAULT_VALUE);
 +
-+	/*--------parse endpoint--------------------------------------*/
-+
 +	ret = v4l2_async_notifier_parse_fwnode_endpoints(
 +				&pdev->dev, &iss->notifier, sizeof(struct iss_async_subdev),
 +				iss_fwnode_parse);
 +	if (ret < 0)
 +		goto error;
-+	/*-------------------------------------------------------------*/
 +
 +	iss->syscon = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,"syscon");
  	if (IS_ERR(iss->syscon)) {
  		ret = PTR_ERR(iss->syscon);
  		goto error;
-@@ -1240,17 +1307,18 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1240,17 +1296,18 @@ static int iss_probe(struct platform_device *pdev)
  	if (ret < 0)
  		goto error;
  
@@ -487,11 +473,11 @@ index b1036baebb03..a4b52bd84b86 100644
  	if (ret < 0)
  		goto error_iss;
  
-+	/* TODO--- this revision should also be handled by parent node sysc --- */
++	/* TODO --- revision should also be handled by parent node sysc --- */
  	iss->revision = iss_reg_read(iss, OMAP4_ISS_MEM_TOP, ISS_HL_REVISION);
  	dev_info(iss->dev, "Revision %08x found\n", iss->revision);
  
-@@ -1310,6 +1378,12 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1310,6 +1367,12 @@ static int iss_probe(struct platform_device *pdev)
  	if (ret < 0)
  		goto error_entities;
  
@@ -504,7 +490,7 @@ index b1036baebb03..a4b52bd84b86 100644
  	omap4iss_put(iss);
  
  	return 0;
-@@ -1321,7 +1395,9 @@ static int iss_probe(struct platform_device *pdev)
+@@ -1321,7 +1384,9 @@ static int iss_probe(struct platform_device *pdev)
  	iss_cleanup_modules(iss);
  error_iss:
  	omap4iss_put(iss);
@@ -514,7 +500,7 @@ index b1036baebb03..a4b52bd84b86 100644
  	mutex_destroy(&iss->iss_mutex);
  
  	return ret;
-@@ -1334,6 +1410,7 @@ static int iss_remove(struct platform_device *pdev)
+@@ -1334,6 +1399,7 @@ static int iss_remove(struct platform_device *pdev)
  	iss_unregister_entities(iss);
  	media_entity_enum_cleanup(&iss->crashed);
  	iss_cleanup_modules(iss);
@@ -522,17 +508,15 @@ index b1036baebb03..a4b52bd84b86 100644
  
  	return 0;
  }
-@@ -1344,12 +1421,27 @@ static const struct platform_device_id omap4iss_id_table[] = {
+@@ -1344,12 +1410,25 @@ static const struct platform_device_id omap4iss_id_table[] = {
  };
  MODULE_DEVICE_TABLE(platform, omap4iss_id_table);
  
-+/* add of match table  */
 +static const struct of_device_id omap4iss_of_table[] = {
 +	{ .compatible = "ti,omap4iss" },
 +	{ },
 +};
 +MODULE_DEVICE_TABLE(of, omap4iss_of_table);
-+/* end adding of match table  */
 +
 +static const struct dev_pm_ops omap4iss_pm_ops = {
 +	.runtime_suspend = omap4iss_runtime_suspend,
@@ -551,10 +535,10 @@ index b1036baebb03..a4b52bd84b86 100644
  };
  
 diff --git a/drivers/staging/media/omap4iss/iss.h b/drivers/staging/media/omap4iss/iss.h
-index 760ee27da704..4c85ecc3bd00 100644
+index 760ee27da704..00d331540e74 100644
 --- a/drivers/staging/media/omap4iss/iss.h
 +++ b/drivers/staging/media/omap4iss/iss.h
-@@ -16,13 +16,14 @@
+@@ -16,14 +16,16 @@
  
  #include <media/v4l2-device.h>
  #include <media/v4l2-mc.h>
@@ -566,20 +550,13 @@ index 760ee27da704..4c85ecc3bd00 100644
  #include <linux/wait.h>
  
 -#include <linux/platform_data/media/omap4iss.h>
-+#include "omap4iss.h"
++#include <linux/pm_qos.h>
  
++#include "omap4iss.h"
  #include "iss_regs.h"
  #include "iss_csiphy.h"
-@@ -31,6 +32,8 @@
- #include "iss_ipipe.h"
- #include "iss_resizer.h"
- 
-+#include <linux/pm_qos.h>
-+
- struct regmap;
- 
- #define to_iss_device(ptr_module)				\
-@@ -88,6 +91,7 @@ struct iss_reg {
+ #include "iss_csi2.h"
+@@ -88,6 +90,7 @@ struct iss_reg {
   */
  struct iss_device {
  	struct v4l2_device v4l2_dev;
@@ -587,7 +564,7 @@ index 760ee27da704..4c85ecc3bd00 100644
  	struct media_device media_dev;
  	struct device *dev;
  	u32 revision;
-@@ -121,8 +125,23 @@ struct iss_device {
+@@ -121,8 +124,23 @@ struct iss_device {
  
  	unsigned int subclk_resources;
  	unsigned int isp_subclk_resources;
@@ -596,15 +573,15 @@ index 760ee27da704..4c85ecc3bd00 100644
 +	struct v4l2_subdev *subdevs[ISS_MAX_SUBDEVS];
 +
 +	struct pm_qos_request pm_qos;
- };
- 
++};
++
 +struct iss_async_subdev {
 +	struct v4l2_async_subdev asd;
 +	struct iss_bus_cfg bus;
 +
 +	struct v4l2_subdev *sd;
-+};
-+
+ };
+ 
 +#define v4l2_subdev_to_bus_cfg(sd) \
 +	(&container_of((sd)->asd, struct iss_async_subdev, asd)->bus)
 +
@@ -751,72 +728,20 @@ index a3a83424a926..f08d67aff7e5 100644
  	media_pipeline_stop(&video->video.entity);
  
  done:
-diff --git a/drivers/staging/media/omap4iss/omap4iss.h b/drivers/staging/media/omap4iss/omap4iss.h
-new file mode 100644
-index 000000000000..5d854170b03e
---- /dev/null
+diff --git a/include/linux/platform_data/media/omap4iss.h b/drivers/staging/media/omap4iss/omap4iss.h
+similarity index 82%
+rename from include/linux/platform_data/media/omap4iss.h
+rename to drivers/staging/media/omap4iss/omap4iss.h
+index 2a511a8fcda7..5d854170b03e 100644
+--- a/include/linux/platform_data/media/omap4iss.h
 +++ b/drivers/staging/media/omap4iss/omap4iss.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef ARCH_ARM_PLAT_OMAP4_ISS_H
-+#define ARCH_ARM_PLAT_OMAP4_ISS_H
-+
-+#include <linux/i2c.h>
-+
-+struct iss_device;
-+
-+enum iss_interface_type {
-+	ISS_INTERFACE_CSI2A_PHY1,
-+	ISS_INTERFACE_CSI2B_PHY2,
-+};
-+
-+/**
-+ * struct iss_csiphy_lane: CSI2 lane position and polarity
-+ * @pos: position of the lane
-+ * @pol: polarity of the lane
-+ */
-+struct iss_csiphy_lane {
-+	u8 pos;
-+	u8 pol;
-+};
-+
-+#define ISS_CSIPHY1_NUM_DATA_LANES	4
-+#define ISS_CSIPHY2_NUM_DATA_LANES	1
-+
-+/**
-+ * struct iss_csiphy_lanes_cfg - CSI2 lane configuration
-+ * @data: Configuration of one or two data lanes
-+ * @clk: Clock lane configuration
-+ */
-+struct iss_csiphy_lanes_cfg {
-+	struct iss_csiphy_lane data[ISS_CSIPHY1_NUM_DATA_LANES];
-+	struct iss_csiphy_lane clk;
-+};
-+
-+/**
-+ * struct iss_csi2_platform_data - CSI2 interface platform data
-+ * @crc: Enable the cyclic redundancy check
-+ * @vpclk_div: Video port output clock control
-+ */
-+struct iss_csi2_platform_data {
-+	unsigned crc:1;
-+	unsigned vpclk_div:2;
-+	struct iss_csiphy_lanes_cfg lanecfg;
-+};
-+
-+struct iss_subdev_i2c_board_info {
-+	struct i2c_board_info *board_info;
-+	int i2c_adapter_id;
-+};
-+
-+struct iss_v4l2_subdevs_group {
-+	struct iss_subdev_i2c_board_info *subdevs;
-+	enum iss_interface_type interface;
-+	union {
-+		struct iss_csi2_platform_data csi2;
-+	} bus; /* gcc < 4.6.0 chokes on anonymous union initializers */
-+};
-+
+@@ -58,9 +58,17 @@ struct iss_v4l2_subdevs_group {
+ 	} bus; /* gcc < 4.6.0 chokes on anonymous union initializers */
+ };
+ 
+-struct iss_platform_data {
+-	struct iss_v4l2_subdevs_group *subdevs;
+-	void (*set_constraints)(struct iss_device *iss, bool enable);
 +struct iss_bus_cfg {
 +	enum iss_interface_type interface;
 +	union {
@@ -828,9 +753,9 @@ index 000000000000..5d854170b03e
 +	struct i2c_board_info *board_info;
 +	int i2c_adapter_id;
 +	struct iss_bus_cfg *bus;
-+};
-+
-+#endif
+ };
+ 
+ #endif
 -- 
 2.14.1
 

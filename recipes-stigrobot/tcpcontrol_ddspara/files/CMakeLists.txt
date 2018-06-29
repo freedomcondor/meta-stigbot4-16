@@ -11,11 +11,12 @@ project(speedTest)
 
 
 add_executable(tcpControl
+#main.cc
 				src/main.cpp
-				src/function.cpp
+		src/function_opengl.cpp
                	src/packet_control_interface.cc
                	src/uart_socket.cc
-				src/tcp_socket.cpp
+		src/tcp_socket.cpp
               )
 
 set_property(TARGET tcpControl PROPERTY CXX_STANDARD 11)
