@@ -1,0 +1,45 @@
+From 908baf24b69004ab15d2787ad94fb2f497d78f65 Mon Sep 17 00:00:00 2001
+From: Condor3397 <freedomcondor@126.com>
+Date: Fri, 16 Mar 2018 11:52:28 +0100
+Subject: [PATCH] vcnl4000
+
+---
+ drivers/iio/light/vcnl4000.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/iio/light/vcnl4000.c b/drivers/iio/light/vcnl4000.c
+index 360b6e98137a..71ba645e8d1b 100644
+--- a/drivers/iio/light/vcnl4000.c
++++ b/drivers/iio/light/vcnl4000.c
+@@ -53,10 +53,20 @@ struct vcnl4000_data {
+ 
+ static const struct i2c_device_id vcnl4000_id[] = {
+ 	{ "vcnl4000", 0 },
++	{ "vcnl4010", 0 },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(i2c, vcnl4000_id);
+ 
++/*  add of_table by Harry ZHU */
++static const struct of_device_id of_vcnl4000_ids[] = {
++	{ .compatible = "vishay,vcnl4000" },
++	{ .compatible = "vishay,vcnl4010" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, of_vcnl4000_ids);
++/*  end of add of_table by Harry ZHU */
++
+ static int vcnl4000_measure(struct vcnl4000_data *data, u8 req_mask,
+ 				u8 rdy_mask, u8 data_reg, int *val)
+ {
+@@ -199,6 +209,7 @@ static int vcnl4000_probe(struct i2c_client *client,
+ static struct i2c_driver vcnl4000_driver = {
+ 	.driver = {
+ 		.name   = VCNL4000_DRV_NAME,
++		.of_match_table = of_match_ptr(of_vcnl4000_ids),
+ 	},
+ 	.probe  = vcnl4000_probe,
+ 	.id_table = vcnl4000_id,
+-- 
+2.14.1
+

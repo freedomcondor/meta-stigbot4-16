@@ -19,6 +19,7 @@ IMAGE_INSTALL += " netinterface \
     tcpcontrol \
     ldd \
     strace \
+    argos3-builderbot \
 "
 
 CORE_OS = " \

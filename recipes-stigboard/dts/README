@@ -1,7 +1,3 @@
 u-boot_%.bbappend
 	a patch that change boot device tree from "omap4-duovero-parlor.dtb" to "omap4-duovero-stig.dtb"
 	remember to check /build/local.conf to switch omap4-duovero-stig.dtb
-linux-stable_%.bbappend
-	add omap4-duovero-stig.dts
-	a .cfg file for drivers switch
-	patches for drivers
