@@ -1,4 +1,4 @@
-#include"function_opengl.h"
+#include"function.h"
 #include"tcp_socket.h"
 #include <stdio.h>
 #include <iostream>

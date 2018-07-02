@@ -27,13 +27,13 @@ float targetKp, targetKi, targetKd;
 ///////////////////  functions  ///////////////////////////
 int function_exit()
 {
-	uint8_t pnStopDriveSystemData[] = {0, 0, 0, 0,
-										0,0,0,0,
-										0,0,0,0,
-										0,0,0,0
-										};
+	uint8_t pnStopDriveSystemData[] = {0, 0};
 	ddsInterface->SendPacket(
-			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED,
+			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED_LEFT,
+			pnStopDriveSystemData,
+			sizeof(pnStopDriveSystemData));
+	ddsInterface->SendPacket(
+			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED_RIGHT,
 			pnStopDriveSystemData,
 			sizeof(pnStopDriveSystemData));
 #ifdef windows
@@ -150,9 +150,13 @@ int function_init()
 	ddsInterface->SendPacket(CPacketControlInterface::CPacket::EType::SET_DDS_ENABLE, true);
 
 	/* Initialize the differential drive system */
-	uint8_t pnStopDriveSystemData[] = {0, 0, 0, 0};
+	uint8_t pnStopDriveSystemData[] = {0, 0};
 	ddsInterface->SendPacket(
-			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED,
+			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED_LEFT,
+			pnStopDriveSystemData,
+			sizeof(pnStopDriveSystemData));
+	ddsInterface->SendPacket(
+			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED_RIGHT,
 			pnStopDriveSystemData,
 			sizeof(pnStopDriveSystemData));
 	printf("initialize complete\n");
@@ -177,11 +181,9 @@ int function_step(int targetLeftSpeed, int targetRightSpeed)
 		currentRightSpeed = targetRightSpeed;
 
 		//uint8_t temp = reinterpret_cast<uint8_t>(currentLeftSpeed & 255);
-		uint8_t pnStopDriveSystemData[] = {
+		uint8_t pnStopDriveSystemDataLeft[] = {
 			reinterpret_cast<uint8_t*>(&currentLeftSpeed)[1],
 			reinterpret_cast<uint8_t*>(&currentLeftSpeed)[0],
-			reinterpret_cast<uint8_t*>(&currentRightSpeed)[1],
-			reinterpret_cast<uint8_t*>(&currentRightSpeed)[0],
 
 			/*
 			reinterpret_cast<uint8_t*>(&currentKp)[3],
@@ -202,9 +204,18 @@ int function_step(int targetLeftSpeed, int targetRightSpeed)
 		};
 		printf("before send");
 		ddsInterface->SendPacket(
-			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED,
-			pnStopDriveSystemData,
-			sizeof(pnStopDriveSystemData));
+			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED_LEFT,
+			pnStopDriveSystemDataLeft,
+			sizeof(pnStopDriveSystemDataLeft));
+
+		uint8_t pnStopDriveSystemDataRight[] = {
+			reinterpret_cast<uint8_t*>(&currentRightSpeed)[1],
+			reinterpret_cast<uint8_t*>(&currentRightSpeed)[0],
+		};
+		ddsInterface->SendPacket(
+			CPacketControlInterface::CPacket::EType::SET_DDS_SPEED_RIGHT,
+			pnStopDriveSystemDataRight,
+			sizeof(pnStopDriveSystemDataRight));
 	}
 
 	printf("currentspeed : %d %d\n",currentLeftSpeed,currentRightSpeed);
