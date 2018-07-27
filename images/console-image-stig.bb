@@ -17,6 +17,7 @@ IMAGE_INSTALL += " netinterface \
     i2c-tools \
     speedcontrol \
     tcpcontrol \
+    cameratest \
     ldd \
     strace \
     argos3-builderbot \
